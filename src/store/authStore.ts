@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type AuthMode = 'login' | 'signup';
+export type AuthMode = 'login' | 'signup';
 
 interface AuthUIState {
   mode: AuthMode;

@@ -16,13 +16,9 @@ function cn(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(' ');
 }
 
-export default function StoryboardSection({
-  items,
-  showStepNav,
-  onGenerateImage,
-  onGoImage,
-  canGoImage,
-}: StoryboardSectionProps) {
+export default function StoryboardSection({ items, showStepNav, onGenerateImage, onGoImage }: StoryboardSectionProps) {
+  const hasImage = items.some((item) => item.imageGenerated);
+
   return (
     <section className='pb-16 pt-8'>
       {showStepNav && <StepNavigation currentStep='storyboard' />}
@@ -77,19 +73,23 @@ export default function StoryboardSection({
               </div>
 
               {item.imageGenerated ? (
-                <button className='relative ml-4 flex h-[42px] w-[82px] items-center justify-center overflow-hidden rounded-[13px] bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.045))] text-[11px] font-light text-white/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]'>
+                <button className='relative ml-4 flex h-[42px] w-[90px] items-center justify-center overflow-hidden rounded-[13px] bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.045))] !text-[12px] font-light text-white/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]'>
                   <span className='absolute inset-0 bg-[radial-gradient(circle_at_30%_18%,rgba(255,255,255,0.05),transparent_40%)]' />
-                  <span className='relative'>⦿ 완료</span>
+                  <span className='relative flex items-center gap-1.5'>
+                    <img src='/success.png' alt='완료' className='h-[14px] w-[14px] object-contain opacity-90' />
+                    <span>완료</span>
+                  </span>
                 </button>
               ) : (
                 <button
                   onClick={() => onGenerateImage(item.id)}
-                  className='relative ml-4 flex h-[38px] w-[118px] items-center justify-center overflow-hidden rounded-[13px] bg-[linear-gradient(180deg,rgba(14,89,95,0.96),rgba(9,58,62,0.96))] text-[11px] font-light text-white shadow-[0_8px_18px_rgba(0,0,0,0.20),inset_0_1px_0_rgba(255,255,255,0.04)] transition hover:opacity-90'
+                  className='relative ml-4 flex h-[38px] w-[122px] items-center justify-center overflow-hidden rounded-[13px] bg-[linear-gradient(180deg,rgba(14,89,95,0.96),rgba(9,58,62,0.96))] !text-[12px] font-light text-white shadow-[0_8px_18px_rgba(0,0,0,0.20),inset_0_1px_0_rgba(255,255,255,0.04)] transition hover:opacity-90'
                 >
                   <span className='absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(34,211,238,0.18),transparent_40%),linear-gradient(180deg,rgba(255,255,255,0.02),transparent_38%)]' />
                   <span className='relative'>이미지 생성</span>
-                  <span className='relative ml-1.5 flex h-[18px] items-center rounded-full bg-white/10 px-1.5 text-[9px] shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]'>
-                    🪙 3
+                  <span className='relative ml-1.5 flex h-[18px] items-center rounded-full bg-white/10 px-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]'>
+                    <img src='/token.png' alt='토큰' className='h-[10px] w-[10px] object-contain opacity-90' />
+                    <span className='ml-1 text-[8px]'>3</span>
                   </span>
                 </button>
               )}
@@ -98,9 +98,9 @@ export default function StoryboardSection({
         ))}
       </div>
 
-      {typeof canGoImage === 'boolean' && onGoImage && (
+      {onGoImage && (
         <div className='mt-7 flex justify-end'>
-          <ActionButton label='이미지 확인' disabled={!canGoImage} onClick={onGoImage} />
+          <ActionButton label='이미지 확인' disabled={!hasImage} onClick={onGoImage} />
         </div>
       )}
     </section>

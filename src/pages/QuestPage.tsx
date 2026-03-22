@@ -60,14 +60,17 @@ const quests = [
 function QuestLevelBadge({ active }: { active?: boolean }) {
   return (
     <div
-      className={`relative flex h-[76px] w-[96px] shrink-0 flex-col items-center justify-center overflow-hidden rounded-[14px] ${
+      className={`relative flex h-full w-[120px] shrink-0 flex-col items-center justify-center overflow-hidden rounded-[14px] ${
         active
           ? 'bg-[linear-gradient(180deg,#41dce3_0%,#25c5cc_58%,#169ea7_100%)] shadow-[0_10px_24px_rgba(24,196,203,0.16)]'
           : 'bg-[linear-gradient(180deg,rgba(11,75,79,0.88),rgba(7,45,49,0.94))]'
       }`}
     >
       <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(255,255,255,0.18),transparent_34%),linear-gradient(180deg,transparent,rgba(0,0,0,0.08))]' />
-      <div className='relative text-[22px] text-white/90'>🔒</div>
+      <div className='relative text-[22px] text-white/90'>
+        {' '}
+        <img src='/lock.png' alt='잠금' className='h-[28px] w-[28px] object-contain opacity-90' />
+      </div>
       <span className='relative mt-1 text-[11px] text-white/90'>Level 1</span>
     </div>
   );
@@ -75,8 +78,9 @@ function QuestLevelBadge({ active }: { active?: boolean }) {
 
 function RewardPill({ reward }: { reward: number }) {
   return (
-    <div className='flex h-[22px] items-center rounded-full bg-[linear-gradient(180deg,rgba(255,255,255,0.10),rgba(255,255,255,0.05))] px-2.5 text-[10px] text-white/82 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]'>
-      🪙 +{reward}
+    <div className='flex h-[22px] gap-2 items-center rounded-full bg-[linear-gradient(180deg,rgba(255,255,255,0.10),rgba(255,255,255,0.05))] px-2.5 text-[10px] text-white/82 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]'>
+      <img src='/token.png' alt='토큰' className='h-[10px] w-[10px] object-contain opacity-90' />
+      <span className='text-sm'>+{reward}</span>
     </div>
   );
 }
@@ -128,13 +132,19 @@ export default function QuestPage() {
             <div key={quest.title} className='flex gap-3'>
               <QuestLevelBadge active={index === 0} />
 
-              <div className='relative min-h-[76px] flex-1 overflow-hidden rounded-[14px] bg-[linear-gradient(180deg,rgba(255,255,255,0.038),rgba(255,255,255,0.016))] px-5 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_14px_34px_rgba(0,0,0,0.24)] backdrop-blur-md'>
+              <div className='relative min-h-[90px] flex-1 overflow-hidden rounded-[14px] bg-[linear-gradient(180deg,rgba(255,255,255,0.038),rgba(255,255,255,0.016))] px-5 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_14px_34px_rgba(0,0,0,0.24)] backdrop-blur-md'>
                 <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_42%_0%,rgba(35,209,215,0.10),transparent_24%),radial-gradient(circle_at_52%_58%,rgba(255,255,255,0.025),transparent_28%),linear-gradient(90deg,rgba(255,255,255,0.008),transparent_28%,rgba(255,255,255,0.015)_62%,rgba(0,0,0,0.06)_100%)]' />
 
                 <div className='relative flex items-start justify-between gap-3'>
                   <div className='min-w-0'>
                     <div className='flex items-center gap-2'>
-                      <span className='text-[12px] text-white/82'>{quest.locked ? '🔒' : '◌'}</span>
+                      <span className='text-[12px] text-white/82'>
+                        {quest.locked ? (
+                          <img src='/lock.png' alt='잠금' className='h-[14px] w-[14px] object-contain opacity-90' />
+                        ) : (
+                          <img src='/success.png' alt='완료' className='h-[14px] w-[14px] object-contain opacity-90' />
+                        )}
+                      </span>
                       <h3 className={`text-[14px] font-medium ${quest.locked ? 'text-white/45' : 'text-white/90'}`}>
                         {quest.title}
                       </h3>

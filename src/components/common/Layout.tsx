@@ -71,7 +71,7 @@ export default function Layout() {
           </div>
 
           <div className='flex items-center gap-2 rounded-full border border-white/15 bg-[linear-gradient(180deg,rgba(255,255,255,0.16),rgba(255,255,255,0.06))] px-4 py-2'>
-            <span>🪙</span>
+            <img src='/token.png' alt='토큰' className='h-[10px] w-[10px] object-contain opacity-90' />
             <span className='text-sm'>12</span>
           </div>
         </div>

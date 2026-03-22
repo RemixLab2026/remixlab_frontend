@@ -3,55 +3,51 @@ import { useNavigate } from 'react-router-dom';
 export default function HomePage() {
   const navigate = useNavigate();
 
-  const userLevel = 1;
-
-  const handleVideo = () => {
-    if (userLevel < 3) {
-      navigate('/locked');
-    } else {
-      navigate('/video');
-    }
-  };
-
   return (
-    <section className='flex min-h-[calc(100vh-84px)] flex-col items-center justify-center px-6 pb-24 pt-12'>
+    <section className='flex min-h-[calc(100vh-88px)] flex-col items-center justify-center px-6 pb-24 pt-8'>
       <p className='mb-6 text-[18px] text-white/62'>
-        아이디어만으로 시작하는 <span className='text-white'>AI 기반 창작 실험실</span>
+        아이디어만으로 시작하는 <span className='font-semibold text-white'>AI기반 창작 실험실</span>
       </p>
+
       <h2
-        className='text-center text-[128px] font-semibold tracking-[-0.075em] text-white'
+        className='text-center text-[128px] font-semibold tracking-[-0.08em] text-white'
         style={{
-          WebkitMaskImage: 'linear-gradient(to right, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 20%, rgba(0,0,0,1) 40%)',
-          maskImage: 'linear-gradient(to right, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 20%, rgba(0,0,0,1) 40%)',
+          WebkitMaskImage:
+            'linear-gradient(to right, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.38) 18%, rgba(255,255,255,1) 42%)',
+          maskImage:
+            'linear-gradient(to right, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.38) 18%, rgba(255,255,255,1) 42%)',
         }}
       >
         Remixlab
       </h2>
-      <div className='mt-10 flex w-full max-w-[860px] items-center gap-5 rounded-[18px] border border-white/10 bg-white/5 px-7 py-5 backdrop-blur-md'>
-        <span className='text-[40px]'>+</span>
+
+      <div className='mt-10 flex w-full max-w-[850px] items-center gap-5 rounded-[18px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03))] px-7 py-5 shadow-[0_12px_40px_rgba(0,0,0,0.24)] backdrop-blur-md'>
+        <span className='text-[38px] text-white/78'>＋</span>
         <input
           placeholder='당신의 아이디어를 입력해주세요.'
-          className='w-full bg-transparent text-[22px] outline-none placeholder:text-white/30'
+          className='w-full bg-transparent text-[20px] text-white outline-none placeholder:text-white/28'
         />
       </div>
 
-      {/* 🔥 버튼 연결 */}
-      <div className='mt-6 flex w-full max-w-[860px] gap-4'>
+      <div className='mt-6 flex w-full max-w-[850px] gap-3'>
         <button
-          onClick={() => navigate('/plot')}
-          className='flex-1 rounded-[14px] bg-cyan-400 py-4 text-black font-semibold'
+          onClick={() => navigate('/generate/plot')}
+          className='flex-1 rounded-[14px] bg-[linear-gradient(90deg,#44dde4_0%,#2bd2d7_100%)] py-4 font-semibold text-black'
         >
           ✦ 플롯 생성
         </button>
 
         <button
-          onClick={() => navigate('/image')}
-          className='flex-1 rounded-[14px] bg-cyan-400 py-4 text-black font-semibold'
+          onClick={() => navigate('/generate/image')}
+          className='flex-1 rounded-[14px] bg-[linear-gradient(90deg,#44dde4_0%,#2bd2d7_100%)] py-4 font-semibold text-black'
         >
           ✦ 이미지 생성
         </button>
 
-        <button onClick={handleVideo} className='flex-1 rounded-[14px] bg-cyan-400 py-4 text-black font-semibold'>
+        <button
+          onClick={() => navigate('/generate/video')}
+          className='flex-1 rounded-[14px] bg-[linear-gradient(90deg,#44dde4_0%,#2bd2d7_100%)] py-4 font-semibold text-black'
+        >
           ✦ 영상 생성
         </button>
       </div>

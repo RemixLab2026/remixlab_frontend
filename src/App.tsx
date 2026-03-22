@@ -1,14 +1,18 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import AuthPage from '@/pages/AuthPage';
-import HomePage from '@/pages/HomePage';
-import PlotPage from '@/pages/PlotPage';
-import ImagePage from '@/pages/ImagePage';
-import VideoPage from '@/pages/VideoPage';
-import LockedPage from '@/pages/LockedPage';
-
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import Layout from '@/components/common/Layout';
 import ProtectedRoute from '@/routes/ProtectedRoute';
 import { useAuthStore } from '@/store/authStore';
-import Layout from '@/components/common/Layout';
+
+import AuthPage from '@/pages/AuthPage';
+import HomePage from '@/pages/HomePage';
+import DashboardPage from '@/pages/DashbaoardPage';
+import QuestPage from '@/pages/QuestPage';
+
+import GeneratePlotPage from '@/pages/GeneratePlotPage';
+import GenerateImagePage from '@/pages/GenerateImagePage';
+import GenerateVideoPage from '@/pages/GenerateVideoPage';
+
+import CreatePage from '@/pages/CreatePage';
 
 export default function App() {
   const isLogin = useAuthStore((state) => state.isLogin);
@@ -16,10 +20,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* 로그인 */}
         <Route path='/login' element={<AuthPage />} />
 
-        {/* 보호된 영역 */}
         <Route
           element={
             <ProtectedRoute>
@@ -28,14 +30,19 @@ export default function App() {
           }
         >
           <Route path='/' element={<HomePage />} />
-          <Route path='/plot' element={<PlotPage />} />
-          <Route path='/image' element={<ImagePage />} />
-          <Route path='/video' element={<VideoPage />} />
-          <Route path='/locked' element={<LockedPage />} />
+          <Route path='/dashboard' element={<DashboardPage />} />
+          <Route path='/quest' element={<QuestPage />} />
+
+          {/* Home에서 들어가는 개별 생성 */}
+          <Route path='/generate/plot' element={<GeneratePlotPage />} />
+          <Route path='/generate/image' element={<GenerateImagePage />} />
+          <Route path='/generate/video' element={<GenerateVideoPage />} />
+
+          {/* Create에서 들어가는 단계형 생성 */}
+          <Route path='/create' element={<CreatePage />} />
         </Route>
 
-        {/* fallback */}
-        <Route path='*' element={<Navigate to={isLogin ? '/' : '/login'} />} />
+        <Route path='*' element={<Navigate to={isLogin ? '/' : '/login'} replace />} />
       </Routes>
     </BrowserRouter>
   );

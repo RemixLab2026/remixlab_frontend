@@ -13,14 +13,14 @@ export default function Layout() {
       <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(0,172,193,0.30),transparent_28%),radial-gradient(circle_at_85%_62%,rgba(120,40,140,0.16),transparent_24%),linear-gradient(180deg,#04101a_0%,#02060d_55%,#000000_100%)]' />
 
       <header className='relative z-10 mx-auto flex max-w-[1280px] items-center justify-between px-8 pt-6'>
-        {/* 왼쪽 로고 */}
+        {/* ✅ 로고 이미지 */}
         <div className='flex shrink-0'>
-          <button onClick={() => navigate('/')} className='text-[18px] font-semibold tracking-tight'>
-            Remixlab
+          <button onClick={() => navigate('/')} className='flex items-center'>
+            <img src='/small.png' alt='Remixlab' className='h-[22px] w-auto opacity-90 transition hover:opacity-100' />
           </button>
         </div>
 
-        {/* 정확히 중앙 고정 */}
+        {/* 중앙 네비 */}
         <nav className='absolute left-1/2 top-6 -translate-x-1/2'>
           <div className='flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 backdrop-blur-md'>
             <button
@@ -61,7 +61,7 @@ export default function Layout() {
           </div>
         </nav>
 
-        {/* 오른쪽 정보 */}
+        {/* 오른쪽 */}
         <div className='ml-auto flex shrink-0 items-center gap-4'>
           <div className='flex items-center gap-2'>
             <span className='text-sm'>Lv. 1</span>

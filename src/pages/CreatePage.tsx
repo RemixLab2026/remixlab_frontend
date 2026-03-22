@@ -122,7 +122,7 @@ export default function CreatePage() {
   };
 
   return (
-    <div className='relative mx-auto max-w-[1280px] px-8 pb-16 pt-8'>
+    <div className='relative mx-auto max-w-[1280px] px-8  pt-8'>
       {showTokenModal && <TokenModal onClose={() => setShowTokenModal(false)} />}
 
       {currentStep === 'idea' && <IdeaEntry idea={idea} setIdea={setIdea} onGenerateFlow={handleGenerateFlow} />}

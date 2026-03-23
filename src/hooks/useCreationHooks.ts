@@ -9,6 +9,18 @@ import {
 } from '@/apis/creation';
 import type { PlotData, PlotResponse, PlotRequest } from '@/types/creation';
 
+type LoosePhotoResponse = {
+  success?: boolean;
+  data?: {
+    imageUrl?: string;
+    url?: string;
+    image_url?: string;
+  };
+  imageUrl?: string;
+  url?: string;
+  image_url?: string;
+};
+
 export const useCreationHooks = () => {
   const queryClient = useQueryClient();
 
@@ -26,14 +38,24 @@ export const useCreationHooks = () => {
   const createPhotoMutation = useMutation<PhotoResponse, Error, CreatePhotoPayload>({
     mutationFn: (payload) => creationApi.createAIPhoto(payload),
     onSuccess: (response, variables) => {
-      if (!response.success || !response.data) return;
-
       const scene = variables.scenes[0];
       if (!scene) return;
 
+      const safeResponse = response as unknown as LoosePhotoResponse;
+
+      const imageUrl =
+        safeResponse?.data?.imageUrl ??
+        safeResponse?.data?.url ??
+        safeResponse?.data?.image_url ??
+        safeResponse?.imageUrl ??
+        safeResponse?.url ??
+        safeResponse?.image_url;
+
+      if (!imageUrl) return;
+
       setGeneratedImages((prev) => ({
         ...prev,
-        [scene.sceneNumber]: response.data.imageUrl,
+        [scene.sceneNumber]: imageUrl,
       }));
     },
   });

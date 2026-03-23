@@ -1,16 +1,24 @@
 import { useState, useEffect, useRef } from 'react';
 import { useCreationHooks } from '@/hooks/useCreationHooks';
+import { useVideoCreation } from '@/hooks/useVideoCreation';
 import type { PlotData } from '@/types/creation';
 
 import IdeaEntry from '@/components/create/IdeaEntry';
 import StoryboardSection from '@/components/create/StoryboardSection';
 import ImagePreviewSection from '@/components/create/ImagePreviewSection';
+import CompleteSection from '@/components/create/CompleteSection';
+import VideoLockedSection from '@/components/create/VideoLockedSection';
+
+type CreateStep = 'idea' | 'storyboard' | 'image' | 'video-locked' | 'complete';
 
 export default function CreatePage() {
-  const [currentStep, setCurrentStep] = useState<'idea' | 'storyboard' | 'image'>('idea');
+  const [currentStep, setCurrentStep] = useState<CreateStep>('idea');
   const [idea, setIdea] = useState('');
   const [plotData, setPlotData] = useState<PlotData | null>(null);
   const hasStartedAutoRef = useRef(false);
+
+  // 예시: 실제로는 유저 정보 store에서 가져오세요.
+  const userLevel = 2;
 
   const {
     createPlotMutation,
@@ -20,6 +28,11 @@ export default function CreatePage() {
     selectedScenes,
     autoGeneratePhotos,
   } = useCreationHooks();
+
+  const { selectedPhotosQuery, createVideoMutation, videoUrl, videoStatus, isPolling } = useVideoCreation(
+    plotData?.creationId,
+    currentStep === 'image'
+  );
 
   const handleGenerateFlow = () => {
     if (!idea.trim()) return;
@@ -44,6 +57,12 @@ export default function CreatePage() {
     }
   }, [currentStep, plotData, autoGeneratePhotos]);
 
+  useEffect(() => {
+    if (videoStatus.toLowerCase() === 'complete' && videoUrl) {
+      setCurrentStep('complete');
+    }
+  }, [videoStatus, videoUrl]);
+
   const handleSelectImage = (sceneNumber: number) => {
     if (!plotData) return;
 
@@ -51,6 +70,26 @@ export default function CreatePage() {
       creationId: plotData.creationId,
       selections: [{ sceneNumber }],
     });
+  };
+
+  const handleGoVideo = () => {
+    if (!plotData) return;
+
+    if (userLevel < 3) {
+      setCurrentStep('video-locked');
+      return;
+    }
+
+    createVideoMutation.mutate(
+      { creationId: plotData.creationId },
+      {
+        onSuccess: (response) => {
+          if (response.success) {
+            setCurrentStep('complete');
+          }
+        },
+      }
+    );
   };
 
   return (
@@ -80,9 +119,22 @@ export default function CreatePage() {
       {currentStep === 'image' && plotData && (
         <ImagePreviewSection
           items={plotData.scenes}
-          generatedImages={generatedImages}
+          selectedPhotos={selectedPhotosQuery.data?.data?.phots ?? []}
           showStepNav={true}
-          onGoVideo={() => {}}
+          onGoVideo={handleGoVideo}
+          canGoVideo={(selectedPhotosQuery.data?.data?.phots?.length ?? 0) > 0}
+          isVideoCreating={createVideoMutation.isPending}
+        />
+      )}
+
+      {currentStep === 'video-locked' && <VideoLockedSection showStepNav={true} />}
+
+      {currentStep === 'complete' && plotData && (
+        <CompleteSection
+          showStepNav={true}
+          videoUrl={videoUrl}
+          isLoading={createVideoMutation.isPending || isPolling || videoStatus.toLowerCase() !== 'complete'}
+          sceneCount={plotData.scenes.length}
         />
       )}
     </div>

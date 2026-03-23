@@ -1,10 +1,15 @@
 import { axiosInstance } from './axiosInstance';
 import type { PlotRequest, PlotResponse, PlotData, Scene } from '@/types/creation';
 
+interface ApiError {
+  errorCode: string;
+  message: string;
+}
+
 interface BaseApiResponse<T> {
   success: boolean;
   data: T;
-  error: string | null;
+  error: ApiError | null;
 }
 
 interface PhotoData {
@@ -20,9 +25,38 @@ export interface SelectPhotoPayload {
   selections: { sceneNumber: number }[];
 }
 
+export interface SelectedPhotoItem {
+  sceneNumber: number;
+  url: string;
+}
+
+export interface SelectedPhotoResponseData {
+  phots: SelectedPhotoItem[];
+  // 만약 실제 응답이 photos 라면 phots -> photos 로 바꾸세요
+}
+
+export interface CreateVideoPayload {
+  creationId: number;
+}
+
+export interface CreateVideoResponseData {
+  videoId: number;
+  soraId: string;
+  message: string;
+}
+
+export interface VideoStatusResponseData {
+  videoId: number;
+  status: string;
+  url: string;
+}
+
 export type PhotoResponse = BaseApiResponse<PhotoData>;
 export type SelectPhotoResponse = BaseApiResponse<null>;
 export type PlotListResponse = BaseApiResponse<PlotData[]>;
+export type SelectedPhotoResponse = BaseApiResponse<SelectedPhotoResponseData>;
+export type CreateVideoResponse = BaseApiResponse<CreateVideoResponseData>;
+export type VideoStatusResponse = BaseApiResponse<VideoStatusResponseData>;
 
 export const creationApi = {
   // 1. AI 플롯 생성
@@ -46,6 +80,26 @@ export const creationApi = {
   // 4. 플롯 목록 조회
   getPlotList: async (): Promise<PlotListResponse> => {
     const response = await axiosInstance.get<PlotListResponse>('/api/v1/creation/plots');
+    return response.data;
+  },
+
+  // 5. 사용자가 선택한 사진 조회
+  getSelectedPhotos: async (creationId: number): Promise<SelectedPhotoResponse> => {
+    const response = await axiosInstance.get<SelectedPhotoResponse>('/api/v1/photo/view/selected', {
+      params: { creationId },
+    });
+    return response.data;
+  },
+
+  // 6. 비디오 생성 요청
+  createVideo: async (payload: CreateVideoPayload): Promise<CreateVideoResponse> => {
+    const response = await axiosInstance.post<CreateVideoResponse>('/api/v1/creation/make/video', payload);
+    return response.data;
+  },
+
+  // 7. 비디오 상태 조회
+  getVideoStatus: async (videoId: number): Promise<VideoStatusResponse> => {
+    const response = await axiosInstance.get<VideoStatusResponse>(`/api/v1/video/retrieve/status/${videoId}`);
     return response.data;
   },
 };

@@ -15,7 +15,7 @@ import GenerateVideoPage from '@/pages/GenerateVideoPage';
 import CreatePage from '@/pages/CreatePage';
 
 export default function App() {
-  const isLogin = useAuthStore((state) => state.isLogin);
+  const isLogin = useAuthStore((state) => !!state.accessToken);
 
   return (
     <BrowserRouter>

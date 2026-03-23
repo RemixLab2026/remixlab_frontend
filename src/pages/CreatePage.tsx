@@ -1,160 +1,90 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { useCreationHooks } from '@/hooks/useCreationHooks';
+import type { PlotData } from '@/types/creation';
 
-import CompleteSection from '@/components/create/CompleteSection';
 import IdeaEntry from '@/components/create/IdeaEntry';
-import ImagePreviewSection from '@/components/create/ImagePreviewSection';
 import StoryboardSection from '@/components/create/StoryboardSection';
-import TokenModal from '@/components/create/TokenModal';
-import VideoLockedSection from '@/components/create/VideoLockedSection';
-import type { CreateStep, StoryboardItem } from '@/types/create';
-
-const INITIAL_STORYBOARD: StoryboardItem[] = [
-  {
-    id: 1,
-    mood: '적막한',
-    tags: ['마법소녀 루나', '별빛이 내리는 밤거리'],
-    description: '길을 걷다가 울음소리를 듣는다.',
-    imageGenerated: false,
-  },
-  {
-    id: 2,
-    mood: '긴장감 있는',
-    tags: ['마법소녀 루나', '어두운 골목'],
-    description: '다친 고양이를 발견한다.',
-    imageGenerated: false,
-  },
-  {
-    id: 3,
-    mood: '따뜻한',
-    tags: ['마법소녀 루나, 고양이', '빛나는 마법'],
-    description: '마법으로 고양이를 치료한다.',
-    imageGenerated: false,
-  },
-  {
-    id: 4,
-    mood: '평화로운',
-    tags: ['마법소녀 루나, 고양이', '달빛 아래 공원'],
-    description: '함께 걷기 시작한다.',
-    imageGenerated: false,
-  },
-  {
-    id: 5,
-    mood: '환상적인',
-    tags: ['마법소녀 루나, 변신한 고양이', '마법의 힘 날개다'],
-    description: '고양이가 요정으로 변신한다.',
-    imageGenerated: false,
-  },
-];
+import ImagePreviewSection from '@/components/create/ImagePreviewSection';
 
 export default function CreatePage() {
-  const [searchParams] = useSearchParams();
-  const [currentStep, setCurrentStep] = useState<CreateStep>('idea');
+  const [currentStep, setCurrentStep] = useState<'idea' | 'storyboard' | 'image'>('idea');
   const [idea, setIdea] = useState('');
-  const [showTokenModal, setShowTokenModal] = useState(false);
-  const [storyboardItems, setStoryboardItems] = useState<StoryboardItem[]>(INITIAL_STORYBOARD);
+  const [plotData, setPlotData] = useState<PlotData | null>(null);
+  const hasStartedAutoRef = useRef(false);
 
-  const tokenCount = 12;
-  const userLevel = 1;
+  const {
+    createPlotMutation,
+    createPhotoMutation,
+    selectPhotoMutation,
+    generatedImages,
+    selectedScenes,
+    autoGeneratePhotos
+  } = useCreationHooks();
 
-  const mode = searchParams.get('mode');
-  const step = searchParams.get('step');
-
-  const canGoImage = useMemo(() => storyboardItems.every((item) => item.imageGenerated), [storyboardItems]);
-  const canGoVideo = useMemo(() => storyboardItems.some((item) => item.imageGenerated), [storyboardItems]);
-  const canComplete = userLevel >= 3;
-
-  useEffect(() => {
-    if (step === 'storyboard') {
-      setCurrentStep('storyboard');
-      return;
-    }
-
-    if (step === 'image') {
-      setCurrentStep('image');
-      return;
-    }
-
-    if (step === 'video') {
-      setCurrentStep('video');
-      return;
-    }
-
-    if (step === 'complete') {
-      setCurrentStep('complete');
-      return;
-    }
-
-    if (mode === 'home-storyboard') {
-      setCurrentStep('storyboard');
-      return;
-    }
-
-    if (mode === 'home-image') {
-      setCurrentStep('image');
-      return;
-    }
-
-    if (mode === 'home-video') {
-      if (userLevel < 3) {
-        setCurrentStep('video');
-      } else {
-        setCurrentStep('complete');
-      }
-      return;
-    }
-
-    setCurrentStep('idea');
-  }, [mode, step, userLevel]);
-
+  // [STEP 1] 아이디어 기반 플롯 생성
   const handleGenerateFlow = () => {
-    if (tokenCount < 1) {
-      setShowTokenModal(true);
-      return;
-    }
-
-    setCurrentStep('storyboard');
-    setStoryboardItems(INITIAL_STORYBOARD);
+    if (!idea.trim()) return;
+    createPlotMutation.mutate(
+        { user_input: idea },
+        {
+          onSuccess: (response) => {
+            if (response.success) {
+              setPlotData(response.data);
+              setCurrentStep('storyboard');
+            }
+          },
+        }
+    );
   };
 
-  const handleGenerateImage = (id: number) => {
-    setStoryboardItems((prev) => prev.map((item) => (item.id === id ? { ...item, imageGenerated: true } : item)));
+  // [STEP 2] 스토리보드 진입 시 자동 사진 생성
+  useEffect(() => {
+    if (currentStep === 'storyboard' && plotData && !hasStartedAutoRef.current) {
+      autoGeneratePhotos(plotData);
+      hasStartedAutoRef.current = true;
+    }
+  }, [currentStep, plotData, autoGeneratePhotos]);
+
+  // [STEP 3] 버튼 클릭 시 사진 선택(확정)
+  const handleSelectImage = (sceneNumber: number) => {
+    if (!plotData) return;
+    selectPhotoMutation.mutate({
+      creationId: plotData.creationId,
+      selections: [{ sceneNumber }]
+    });
   };
 
   return (
-    <div className='relative mx-auto max-w-[1280px] px-8  pt-8'>
-      {showTokenModal && <TokenModal onClose={() => setShowTokenModal(false)} />}
+      <div className='mx-auto max-w-[1280px] px-8 pt-8'>
+        {currentStep === 'idea' && (
+            <IdeaEntry
+                idea={idea}
+                setIdea={setIdea}
+                onGenerateFlow={handleGenerateFlow}
+                isPending={createPlotMutation.isPending}
+            />
+        )}
 
-      {currentStep === 'idea' && <IdeaEntry idea={idea} setIdea={setIdea} onGenerateFlow={handleGenerateFlow} />}
+        {currentStep === 'storyboard' && plotData && (
+            <StoryboardSection
+                items={plotData.scenes}
+                generatedImages={generatedImages}
+                selectedScenes={selectedScenes}
+                isPhotoPending={createPhotoMutation.isPending}
+                pendingSceneNumber={createPhotoMutation.variables?.scenes[0].sceneNumber}
+                isSelectPending={selectPhotoMutation.isPending}
+                onSelectImage={handleSelectImage}
+                onGoImage={() => setCurrentStep('image')}
+            />
+        )}
 
-      {currentStep === 'storyboard' && (
-        <StoryboardSection
-          items={storyboardItems}
-          showStepNav={!mode?.startsWith('home-')}
-          onGenerateImage={handleGenerateImage}
-          onGoImage={!mode?.startsWith('home-') ? () => setCurrentStep('image') : undefined}
-          canGoImage={!mode?.startsWith('home-') ? canGoImage : undefined}
-        />
-      )}
-
-      {currentStep === 'image' && (
-        <ImagePreviewSection
-          items={storyboardItems}
-          showStepNav={!mode?.startsWith('home-')}
-          onGoVideo={!mode?.startsWith('home-') ? () => setCurrentStep('video') : undefined}
-          canGoVideo={!mode?.startsWith('home-') ? canGoVideo : undefined}
-        />
-      )}
-
-      {currentStep === 'video' && (
-        <VideoLockedSection
-          showStepNav={!mode?.startsWith('home-')}
-          onGoComplete={!mode?.startsWith('home-') ? () => setCurrentStep('complete') : undefined}
-          completeEnabled={!mode?.startsWith('home-') ? canComplete : undefined}
-        />
-      )}
-
-      {currentStep === 'complete' && <CompleteSection showStepNav={!mode?.startsWith('home-')} />}
-    </div>
+        {currentStep === 'image' && plotData && (
+            <ImagePreviewSection
+                items={plotData.scenes}
+                generatedImages={generatedImages}
+                onGoVideo={() => {}} // 다음 단계 연결
+            />
+        )}
+      </div>
   );
 }

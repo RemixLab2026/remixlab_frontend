@@ -2,7 +2,7 @@ import AuthCard from '@/components/auth/AuthCard';
 import AuthForm from '@/components/auth/AuthForm';
 import AuthToggle from '@/components/auth/AuthToggle';
 
-import { useAuthHooks } from '@/hooks/useAuthMutation';
+import { useAuthHooks } from '@/hooks/useAuthHooks.ts';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 

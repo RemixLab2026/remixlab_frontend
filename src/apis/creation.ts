@@ -16,6 +16,14 @@ interface PhotoData {
   imageUrl: string;
 }
 
+export interface TextToPhotoPayload {
+  prompt: string;
+}
+
+export interface TextToPhotoData {
+  url: string;
+}
+
 export interface CreatePhotoPayload extends Omit<PlotData, 'creationId'> {
   scenes: Scene[];
 }
@@ -32,7 +40,7 @@ export interface SelectedPhotoItem {
 
 export interface SelectedPhotoResponseData {
   phots: SelectedPhotoItem[];
-  // 만약 실제 응답이 photos 라면 phots -> photos 로 바꾸세요
+  // 실제 응답이 photos면 phots -> photos로 변경
 }
 
 export interface CreateVideoPayload {
@@ -52,6 +60,7 @@ export interface VideoStatusResponseData {
 }
 
 export type PhotoResponse = BaseApiResponse<PhotoData>;
+export type TextToPhotoResponse = BaseApiResponse<TextToPhotoData>;
 export type SelectPhotoResponse = BaseApiResponse<null>;
 export type PlotListResponse = BaseApiResponse<PlotData[]>;
 export type SelectedPhotoResponse = BaseApiResponse<SelectedPhotoResponseData>;
@@ -65,9 +74,15 @@ export const creationApi = {
     return response.data;
   },
 
-  // 2. AI 사진 생성
+  // 2. 플롯 기반 AI 사진 생성
   createAIPhoto: async (payload: CreatePhotoPayload): Promise<PhotoResponse> => {
     const response = await axiosInstance.post<PhotoResponse>('/api/v1/creation/make/photo', payload);
+    return response.data;
+  },
+
+  // 2-1. 텍스트 기반 AI 사진 생성
+  createTextToPhoto: async (payload: TextToPhotoPayload): Promise<TextToPhotoResponse> => {
+    const response = await axiosInstance.post<TextToPhotoResponse>('/api/v1/creation/text/make/photo', payload);
     return response.data;
   },
 

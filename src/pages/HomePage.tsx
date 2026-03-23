@@ -45,7 +45,32 @@ export default function HomePage() {
     },
   });
 
-  const isPending = isPlotPending || isImagePending;
+  // 텍스트 기반 비디오 생성 Mutation
+  const { mutate: handleCreateVideo, isPending: isVideoPending } = useMutation({
+    mutationFn: () => creationApi.createTextToVideo({ prompt: userInput }),
+    onSuccess: (response) => {
+      if (response.success) {
+        console.log('생성된 비디오 요청:', response.data);
+
+        navigate('/generate/video', {
+          state: {
+            videoId: response.data.videoId,
+            soraId: response.data.soraId,
+            message: response.data.message,
+            prompt: userInput,
+          },
+        });
+      } else {
+        alert(response.error?.message || '비디오 생성에 실패했습니다.');
+      }
+    },
+    onError: (error) => {
+      alert('비디오 생성 중 오류가 발생했습니다.');
+      console.error(error);
+    },
+  });
+
+  const isPending = isPlotPending || isImagePending || isVideoPending;
 
   return (
     <section className='flex min-h-[calc(100vh-88px)] flex-col items-center justify-center px-4 pb-24 pt-8'>
@@ -100,11 +125,14 @@ export default function HomePage() {
         </button>
 
         <button
-          onClick={() => navigate('/generate/video')}
+          onClick={() => {
+            if (!userInput.trim()) return alert('아이디어를 입력해주세요.');
+            handleCreateVideo();
+          }}
           disabled={isPending}
           className='flex-1 rounded-[12px] bg-[linear-gradient(90deg,#44dde4_0%,#2bd2d7_100%)] py-3.5 text-[13px] font-semibold text-black transition hover:opacity-90 disabled:opacity-50'
         >
-          ✦ 영상 생성
+          {isVideoPending ? '✦ 생성 중...' : '✦ 영상 생성'}
         </button>
       </div>
     </section>

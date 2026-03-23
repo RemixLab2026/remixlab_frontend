@@ -1,4 +1,4 @@
-import type { AuthMode } from '../../store/authStore';
+import type { AuthMode } from '@/store/authStore';
 
 interface AuthToggleProps {
   mode: AuthMode;

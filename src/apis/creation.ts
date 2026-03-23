@@ -8,19 +8,19 @@ export const creationApi = {
         return response.data;
     },
 
-    // 2. AI 사진 생성 (Response 타입은 호출부에서 처리하거나 아래처럼 정의)
+    // 2. AI 사진 생성 (각 장면별)
     createAIPhoto: async (payload: any): Promise<any> => {
         const response = await axiosInstance.post('/api/v1/creation/make/photo', payload);
         return response.data;
     },
 
-    // 3. 사진 선택하기 (추가됨)
+    // 3. 사진 선택하기 (DB 확정 등록)
     selectPhoto: async (payload: { creationId: number; selections: { sceneNumber: number }[] }): Promise<any> => {
         const response = await axiosInstance.post('/api/v1/photo/select', payload);
         return response.data;
     },
 
-    // 4. 목록 조회
+    // 4. 내 플롯 목록 조회
     getPlotList: async () => {
         const response = await axiosInstance.get('/api/v1/creation/plots');
         return response.data;

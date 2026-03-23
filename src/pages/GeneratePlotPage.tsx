@@ -8,7 +8,7 @@ const STORY_TAGS = ['스릴러', '코미디', '드라마', '애니메이션', '�
 export default function GeneratePlotPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const hasStartedAutoRef = useRef(false); // 자동 생성 중복 실행 방지
+  const hasStartedAutoRef = useRef(false);
 
   const {
     createPhotoMutation,
@@ -20,7 +20,7 @@ export default function GeneratePlotPage() {
 
   const plotData = location.state?.plotData as PlotData | undefined;
 
-  // 💡 1. 진입 시 자동으로 모든 플롯의 AI 사진 생성 요청
+  // 1. 진입 시 모든 플롯 사진 자동 생성 (백그라운드)
   useEffect(() => {
     if (plotData && !hasStartedAutoRef.current) {
       autoGeneratePhotos(plotData);
@@ -32,11 +32,9 @@ export default function GeneratePlotPage() {
 
   if (!plotData) return null;
 
-  // 💡 2. 버튼 클릭 시 "사진 선택하기" API만 실행
+  // 2. 버튼 클릭 시 "사진 선택" API만 연동
   const handleSelectImage = (sceneNumber: number) => {
     if (!plotData || typeof plotData.creationId !== 'number') return;
-
-    // 이미 생성되어 보관된 이미지를 서버에 "선택" 확정 요청
     selectPhotoMutation.mutate({
       creationId: plotData.creationId,
       selections: [{ sceneNumber }]
@@ -45,6 +43,7 @@ export default function GeneratePlotPage() {
 
   return (
       <section className='mx-auto max-w-[1280px] px-8 pb-16 pt-10'>
+        {/* 헤더 부분 */}
         <div className='mb-8 flex items-end justify-between'>
           <div>
             <h1 className='text-[28px] font-bold text-white mb-2'>{plotData.title}</h1>
@@ -54,13 +53,14 @@ export default function GeneratePlotPage() {
           </div>
           <div className='flex gap-2'>
             {STORY_TAGS.map((tag, idx) => (
-                <button key={idx} className={idx === 0 ? 'rounded-full bg-cyan-500/10 px-3.5 py-1.5 text-[11px] text-cyan-300 border border-cyan-500/50' : 'rounded-full bg-white/5 px-3.5 py-1.5 text-[11px] text-white/70'}>
+                <button key={idx} className={idx === 0 ? 'rounded-full bg-cyan-500/10 px-3.5 py-1.5 text-[11px] text-cyan-300 border border-cyan-500/50 shadow-[0_0_12px_rgba(34,211,238,0.1)]' : 'rounded-full bg-white/5 px-3.5 py-1.5 text-[11px] text-white/70'}>
                   {tag}
                 </button>
             ))}
           </div>
         </div>
 
+        {/* 스토리보드 리스트 */}
         <div className='space-y-4'>
           {plotData.scenes.map((scene) => {
             const isImageReady = !!generatedImages[scene.sceneNumber];
@@ -71,34 +71,49 @@ export default function GeneratePlotPage() {
             return (
                 <div key={scene.sceneNumber} className='flex gap-5'>
                   {/* 왼쪽 인덱스 박스 */}
-                  <div className='relative flex h-[100px] w-[150px] shrink-0 flex-col items-center justify-center rounded-[22px] bg-gradient-to-b from-[#3ee0e6] to-[#1da8af] text-white'>
-                    <span className='text-[32px] font-bold'>{scene.sceneNumber}</span>
-                    {isImageReady && <span className='text-[9px] font-bold bg-black/20 px-1.5 py-0.5 rounded mt-1'>READY</span>}
+                  <div className={`relative flex h-[100px] w-[150px] shrink-0 flex-col items-center justify-center rounded-[22px] transition-all ${isSelected ? 'bg-cyan-950/40 text-cyan-500 border border-cyan-500/20' : 'bg-gradient-to-b from-[#3ee0e6] to-[#1da8af] text-white shadow-[0_12px_28px_rgba(24,196,203,0.16)]'}`}>
+                    <span className='text-[32px] font-bold leading-none'>{scene.sceneNumber}</span>
+                    {isImageReady && !isSelected && <span className='text-[9px] font-bold bg-black/20 px-1.5 py-0.5 rounded mt-1'>READY</span>}
                   </div>
 
                   {/* 정보 카드 */}
-                  <div className='relative flex min-h-[100px] flex-1 items-center justify-between rounded-[22px] bg-white/5 px-8 py-5 backdrop-blur-md border border-white/10'>
+                  <div className='relative flex min-h-[100px] flex-1 items-center justify-between rounded-[22px] bg-[linear-gradient(180deg,rgba(255,255,255,0.038),rgba(255,255,255,0.016))] px-8 py-5 backdrop-blur-md border border-white/10'>
                     <div className='flex-1 pr-8'>
                       <div className='flex gap-2 mb-3'>
                         {scene.visualElements.split(',').map((tag, i) => (
                             <span key={i} className='rounded-full bg-cyan-500/10 px-2.5 py-1 text-[11px] text-cyan-300'>{tag.trim()}</span>
                         ))}
                       </div>
-                      <p className='text-[16px] text-white/90'>{scene.sceneDescription}</p>
+                      <p className='text-[16px] leading-relaxed text-white/90 font-medium'>{scene.sceneDescription}</p>
                     </div>
 
-                    {/* 💡 버튼: 자동 생성된 사진을 DB에 "선택" 처리 */}
-                    <button
-                        onClick={() => handleSelectImage(scene.sceneNumber)}
-                        disabled={!isImageReady || isSelected || isSelectPending}
-                        className='relative flex h-[46px] w-[134px] items-center justify-center rounded-[16px] bg-[#0e595f] text-[13px] font-semibold text-white transition hover:opacity-90 disabled:opacity-30'
-                    >
-                      {isSelectPending ? '등록 중...' :
-                          isSelected ? '선택 완료' :
-                              isPhotoPending || !isImageReady ? '생성 대기...' : '이미지 선택'}
-
-                      {isSelected && <img src='/success.png' className='ml-2 h-3.5 w-3.5' alt="done" />}
-                    </button>
+                    {/* 💡 조건부 버튼 로직 */}
+                    {isSelected ? (
+                        /* 완료된 플롯: '완료' 표시 */
+                        <div className='flex h-[46px] w-[134px] items-center justify-center rounded-[16px] bg-white/5 text-[13px] font-medium text-white/40 border border-white/5'>
+                          <img src='/success.png' alt='완료' className='mr-2 h-3.5 w-3.5 opacity-40' />
+                          <span>완료</span>
+                        </div>
+                    ) : (
+                        /* 미클릭 플롯: '이미지 선택' 버튼 유지 */
+                        <button
+                            onClick={() => handleSelectImage(scene.sceneNumber)}
+                            disabled={!isImageReady || isSelectPending}
+                            className={`relative flex h-[46px] w-[134px] items-center justify-center rounded-[16px] !text-[13px] font-semibold text-white transition-all active:scale-95 ${
+                                !isImageReady ? 'bg-white/5 opacity-30 cursor-not-allowed' : 'bg-[#0e595f] hover:bg-[#126e75] shadow-[0_10px_22px_rgba(0,0,0,0.22)]'
+                            }`}
+                        >
+                    <span className='relative'>
+                      {isSelectPending ? '등록 중...' : isPhotoPending || !isImageReady ? '생성 중...' : '이미지 선택'}
+                    </span>
+                          {!isSelectPending && isImageReady && (
+                              <span className='relative ml-1.5 flex h-[18px] items-center rounded-full bg-white/10 px-1.5'>
+                        <img src='/token.png' alt='토큰' className='h-[10px] w-[10px]' />
+                        <span className='ml-1 text-[8px]'>3</span>
+                      </span>
+                          )}
+                        </button>
+                    )}
                   </div>
                 </div>
             );

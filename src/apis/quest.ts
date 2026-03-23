@@ -14,7 +14,7 @@ export interface QuestApiResponse {
 export const questApi = {
     // 내 퀘스트 목록 가져오기
     getMyQuests: async () => {
-        const response = await axiosInstance.get<QuestApiResponse>('/api/v1/quests');
+        const response = await axiosInstance.get<QuestApiResponse>('/api/v1/quest/show');
         // 데이터의 깊은 곳(quests 배열)까지 바로 접근해서 리턴합니다.
         return response.data.data.quests;
     },

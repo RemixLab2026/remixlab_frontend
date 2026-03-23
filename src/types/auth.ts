@@ -4,6 +4,6 @@ export interface AuthRequest {
 }
 
 export interface UserInfo {
-    id: number;
+    exp: number;
     username: string;
 }

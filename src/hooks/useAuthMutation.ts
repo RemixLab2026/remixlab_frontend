@@ -1,10 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { authApi } from '@/apis/auth';
 import { useAuthStore } from '@/store/authStore';
 import type {AuthRequest} from '@/types/auth';
 
 export const useAuthHooks = () => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
   const accessToken = useAuthStore((state) => state.accessToken);
 
@@ -32,6 +34,10 @@ export const useAuthHooks = () => {
 
         // 로그인 성공 후 즉시 유저 정보를 가져오도록 캐시 무효화
         queryClient.invalidateQueries({ queryKey: ['userInfo'] });
+
+        // 홈 화면으로 리다이렉트
+        navigate('/', { replace: true });
+
       } else {
         console.warn('로그인은 성공했으나 Header에 토큰이 없습니다.');
       }

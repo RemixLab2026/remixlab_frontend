@@ -18,26 +18,25 @@ export default function CreatePage() {
     selectPhotoMutation,
     generatedImages,
     selectedScenes,
-    autoGeneratePhotos
+    autoGeneratePhotos,
   } = useCreationHooks();
 
-  // [STEP 1] 아이디어 기반 플롯 생성
   const handleGenerateFlow = () => {
     if (!idea.trim()) return;
+
     createPlotMutation.mutate(
-        { user_input: idea },
-        {
-          onSuccess: (response) => {
-            if (response.success) {
-              setPlotData(response.data);
-              setCurrentStep('storyboard');
-            }
-          },
-        }
+      { user_input: idea },
+      {
+        onSuccess: (response) => {
+          if (response.success) {
+            setPlotData(response.data);
+            setCurrentStep('storyboard');
+          }
+        },
+      }
     );
   };
 
-  // [STEP 2] 스토리보드 진입 시 자동 사진 생성
   useEffect(() => {
     if (currentStep === 'storyboard' && plotData && !hasStartedAutoRef.current) {
       autoGeneratePhotos(plotData);
@@ -45,46 +44,47 @@ export default function CreatePage() {
     }
   }, [currentStep, plotData, autoGeneratePhotos]);
 
-  // [STEP 3] 버튼 클릭 시 사진 선택(확정)
   const handleSelectImage = (sceneNumber: number) => {
     if (!plotData) return;
+
     selectPhotoMutation.mutate({
       creationId: plotData.creationId,
-      selections: [{ sceneNumber }]
+      selections: [{ sceneNumber }],
     });
   };
 
   return (
-      <div className='mx-auto max-w-[1280px] px-8 pt-8'>
-        {currentStep === 'idea' && (
-            <IdeaEntry
-                idea={idea}
-                setIdea={setIdea}
-                onGenerateFlow={handleGenerateFlow}
-                isPending={createPlotMutation.isPending}
-            />
-        )}
+    <div className='mx-auto max-w-[1280px] px-8 pt-8'>
+      {currentStep === 'idea' && (
+        <IdeaEntry
+          idea={idea}
+          setIdea={setIdea}
+          onGenerateFlow={handleGenerateFlow}
+          isPending={createPlotMutation.isPending}
+        />
+      )}
 
-        {currentStep === 'storyboard' && plotData && (
-            <StoryboardSection
-                items={plotData.scenes}
-                generatedImages={generatedImages}
-                selectedScenes={selectedScenes}
-                isPhotoPending={createPhotoMutation.isPending}
-                pendingSceneNumber={createPhotoMutation.variables?.scenes[0].sceneNumber}
-                isSelectPending={selectPhotoMutation.isPending}
-                onSelectImage={handleSelectImage}
-                onGoImage={() => setCurrentStep('image')}
-            />
-        )}
+      {currentStep === 'storyboard' && plotData && (
+        <StoryboardSection
+          items={plotData.scenes}
+          generatedImages={generatedImages}
+          selectedScenes={selectedScenes}
+          isPhotoPending={createPhotoMutation.isPending}
+          pendingSceneNumber={createPhotoMutation.variables?.scenes[0].sceneNumber}
+          isSelectPending={selectPhotoMutation.isPending}
+          onSelectImage={handleSelectImage}
+          onGoImage={() => setCurrentStep('image')}
+        />
+      )}
 
-        {currentStep === 'image' && plotData && (
-            <ImagePreviewSection
-                items={plotData.scenes}
-                generatedImages={generatedImages}
-                onGoVideo={() => {}} // 다음 단계 연결
-            />
-        )}
-      </div>
+      {currentStep === 'image' && plotData && (
+        <ImagePreviewSection
+          items={plotData.scenes}
+          generatedImages={generatedImages}
+          showStepNav={true}
+          onGoVideo={() => {}}
+        />
+      )}
+    </div>
   );
 }

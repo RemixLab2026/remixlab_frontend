@@ -1,7 +1,7 @@
 import axios, {type InternalAxiosRequestConfig } from 'axios';
 import { useAuthStore } from '@/store/authStore';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://34.50.38.95:8080';
+const BASE_URL = import.meta.env.VITE_API_URL || '/api-proxy';
 
 export const axiosInstance = axios.create({
     baseURL: BASE_URL,

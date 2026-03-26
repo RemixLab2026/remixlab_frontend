@@ -286,4 +286,41 @@ export const dummyCreationApi = {
       }, 500);
     });
   },
+
+  // 🌟 [신규 추가] 비디오 생성 요청 (더미)
+  createVideo: async (payload: CreateVideoPayload): Promise<CreateVideoResponse> => {
+    console.log(`[더미 API] 비디오 생성 요청 (Creation ID: ${payload.creationId})`);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          success: true,
+          data: {
+            videoId: 999,
+            soraId: "sora-dummy-12345",
+            message: "비디오 생성이 시작되었습니다.",
+          },
+          error: null,
+        });
+      }, 1500);
+    });
+  },
+
+  // 🌟 [신규 추가] 비디오 상태 조회 (더미)
+  getVideoStatus: async (videoId: number): Promise<VideoStatusResponse> => {
+    console.log(`[더미 API] 비디오 상태 조회 중... (Video ID: ${videoId})`);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          success: true,
+          data: {
+            videoId,
+            status: "complete", // 'complete' 상태를 반환하여 다음 단계로 넘김
+            url: "https://www.w3schools.com/html/mov_bbb.mp4", // 테스트용 무료 MP4
+          },
+          error: null,
+        });
+      }, 1000);
+    });
+  },
+
 };

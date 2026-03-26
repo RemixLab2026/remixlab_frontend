@@ -29,7 +29,7 @@ export default function IdeaEntry({ idea, setIdea, onGenerateFlow, isPending }: 
             <button
                 onClick={onGenerateFlow}
                 disabled={isPending || !idea.trim()}
-                className={`mt-8 flex h-[64px] w-full max-w-[1000px] items-center justify-center rounded-[18px] text-[22px] font-semibold transition-all shadow-[0_0_22px_rgba(55,220,225,0.18)] ${
+                className={`cursor-pointer mt-8 flex h-[64px] w-full max-w-[1000px] items-center justify-center rounded-[18px] text-[22px] font-semibold transition-all shadow-[0_0_22px_rgba(55,220,225,0.18)] ${
                     isPending || !idea.trim()
                         ? 'cursor-not-allowed bg-white/10 text-white/30 shadow-none'
                         : 'bg-[linear-gradient(90deg,#44dde4_0%,#2bd2d7_100%)] text-black hover:opacity-90 active:scale-[0.98]'

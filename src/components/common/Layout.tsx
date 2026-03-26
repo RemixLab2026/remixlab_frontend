@@ -1,5 +1,5 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import {useAuthStore} from "@/store/authStore.ts";
+import { useAuthStore } from '@/store/authStore';
 
 export default function Layout() {
   const navigate = useNavigate();
@@ -10,6 +10,13 @@ export default function Layout() {
   const isHomeActive = location.pathname === '/' || location.pathname.startsWith('/generate/');
 
   const userInfo = useAuthStore((state) => state.userInfo);
+
+  // 🌟 헤더용 동적 퍼센트 계산 로직 추가
+  const maxXp = 1000; // 대시보드와 동일한 기준 사용
+  const currentExp = userInfo?.exp ?? 0;
+  // 전체 퍼센트 계산 (0 ~ 100 사이)
+  const headerExpPercentage = Math.min((currentExp / maxXp) * 100, 100);
+
   return (
       <main className='relative min-h-screen overflow-hidden bg-[#02060d] text-white'>
         <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(0,172,193,0.30),transparent_28%),radial-gradient(circle_at_85%_62%,rgba(120,40,140,0.16),transparent_24%),linear-gradient(180deg,#04101a_0%,#02060d_55%,#000000_100%)]' />
@@ -66,12 +73,12 @@ export default function Layout() {
           {/* 오른쪽 */}
           <div className='ml-auto flex shrink-0 items-center gap-4'>
             <div className='flex items-center gap-2'>
-              {/* 더미 데이터 바인딩 */}
               <span className='text-sm'>Lv. {userInfo?.level ?? 1}</span>
               <div className='h-[8px] w-[110px] rounded-full bg-white/18'>
                 <div
-                    className='h-full rounded-full bg-white transition-all duration-500'
-                    style={{ width: `${userInfo?.expPercentage ?? 0}%` }}
+                    className='h-full rounded-full bg-cyan-400 transition-all duration-500 shadow-[0_0_10px_rgba(34,211,238,0.5)]'
+                    // 🌟 하드코딩된 userInfo.expPercentage 대신 계산된 값 사용
+                    style={{ width: `${headerExpPercentage}%` }}
                 />
               </div>
             </div>

@@ -38,7 +38,7 @@ export const useAuthStore = create<AuthState>()(
                     username: '리믹스랩_마스터', // 더미 데이터
                     exp: 350,
                     level: 4,
-                    expPercentage: 65, // 65% 채워진 상태
+                    expPercentage: 35, // 35% 채워진 상태
                     token: 1500
                 }
             }),

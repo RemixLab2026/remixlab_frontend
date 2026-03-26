@@ -1,14 +1,14 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query'; // 🌟 useQuery, useQueryClient 제거
 import { useNavigate } from 'react-router-dom';
 import { authApi } from '@/apis/auth';
 import { useAuthStore } from '@/store/authStore';
-import type {AuthRequest} from '@/types/auth';
+import type { AuthRequest } from '@/types/auth';
 
 export const useAuthHooks = () => {
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const setAccessToken = useAuthStore((state) => state.setAccessToken);
-  const accessToken = useAuthStore((state) => state.accessToken);
+
+  // setAccessToken 대신, 토큰과 더미 유저 데이터를 한 번에 세팅해 주는 login 액션을 가져옵니다.
+  const loginAction = useAuthStore((state) => state.login);
 
   // 1. 회원가입 (응답 상태 201 확인)
   const registerMutation = useMutation({
@@ -16,7 +16,7 @@ export const useAuthHooks = () => {
     onSuccess: (response) => {
       if (response.status === 201) {
         console.log('회원가입이 성공적으로 완료되었습니다.');
-        // 필요시 리다이렉트 로직 추가 (예: navigate('/login'))
+        // 필요시 모드를 'login'으로 변경하거나 리다이렉트 (예: navigate('/login'))
       }
     },
     onError: (error) => {
@@ -29,15 +29,11 @@ export const useAuthHooks = () => {
     mutationFn: (data: AuthRequest) => authApi.login(data),
     onSuccess: ({ token }) => {
       if (token) {
-        // 성공적으로 200이 떨어지고 Header에서 토큰을 추출했다면 스토어에 저장
-        setAccessToken(token);
-
-        // 로그인 성공 후 즉시 유저 정보를 가져오도록 캐시 무효화
-        queryClient.invalidateQueries({ queryKey: ['userInfo'] });
+        // Zustand의 login 액션 호출 (토큰 저장 + 더미 유저 정보 자동 세팅)
+        loginAction(token);
 
         // 홈 화면으로 리다이렉트
         navigate('/', { replace: true });
-
       } else {
         console.warn('로그인은 성공했으나 Header에 토큰이 없습니다.');
       }
@@ -47,16 +43,11 @@ export const useAuthHooks = () => {
     }
   });
 
-  // 3. 유저 정보 조회 (토큰이 있을 때만 동작)
-  const userInfoQuery = useQuery({
-    queryKey: ['userInfo'],
-    queryFn: authApi.getUserInfo,
-    enabled: !!accessToken, // accessToken이 존재할 때만 API 호출 (자동 연동)
-  });
+  // 3. 유저 정보 조회 (userInfoQuery) 제거됨
+  // 이유: 백엔드 API 대신 Zustand의 더미 상태(state)로 화면을 그리기로 했기 때문입니다.
 
   return {
     registerMutation,
     loginMutation,
-    userInfoQuery,
   };
 };

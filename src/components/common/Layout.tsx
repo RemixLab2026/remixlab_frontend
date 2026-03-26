@@ -1,4 +1,5 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import {useAuthStore} from "@/store/authStore.ts";
 
 export default function Layout() {
   const navigate = useNavigate();
@@ -8,6 +9,7 @@ export default function Layout() {
   const isCreateActive = location.pathname.startsWith('/create');
   const isHomeActive = location.pathname === '/' || location.pathname.startsWith('/generate/');
 
+  const userInfo = useAuthStore((state) => state.userInfo);
   return (
       <main className='relative min-h-screen overflow-hidden bg-[#02060d] text-white'>
         <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(0,172,193,0.30),transparent_28%),radial-gradient(circle_at_85%_62%,rgba(120,40,140,0.16),transparent_24%),linear-gradient(180deg,#04101a_0%,#02060d_55%,#000000_100%)]' />
@@ -64,15 +66,19 @@ export default function Layout() {
           {/* 오른쪽 */}
           <div className='ml-auto flex shrink-0 items-center gap-4'>
             <div className='flex items-center gap-2'>
-              <span className='text-sm'>Lv. 1</span>
+              {/* 더미 데이터 바인딩 */}
+              <span className='text-sm'>Lv. {userInfo?.level ?? 1}</span>
               <div className='h-[8px] w-[110px] rounded-full bg-white/18'>
-                <div className='h-full w-[70%] rounded-full bg-white' />
+                <div
+                    className='h-full rounded-full bg-white transition-all duration-500'
+                    style={{ width: `${userInfo?.expPercentage ?? 0}%` }}
+                />
               </div>
             </div>
 
             <div className='flex items-center gap-2 rounded-full border border-white/15 bg-[linear-gradient(180deg,rgba(255,255,255,0.16),rgba(255,255,255,0.06))] px-4 py-2'>
               <img src='/token.png' alt='토큰' className='h-[10px] w-[10px] object-contain opacity-90' />
-              <span className='text-sm'>12</span>
+              <span className='text-sm'>{userInfo?.token ?? 0}</span>
             </div>
           </div>
         </header>

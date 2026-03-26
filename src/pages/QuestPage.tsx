@@ -1,4 +1,4 @@
-import { useQuestHooks } from '@/hooks/useQuestHooks'; // 💡 분리된 훅 가져오기
+import { useQuestHooks } from '@/hooks/useQuestHooks';
 
 type QuestDetail = {
   name: string;

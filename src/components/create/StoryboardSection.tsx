@@ -49,7 +49,7 @@ export default function StoryboardSection({
                                     <p className='text-[16px] text-white/90 leading-relaxed'>{scene.sceneDescription}</p>
                                 </div>
 
-                                {/* 💡 버튼 조건부 렌더링 */}
+                                {/* 버튼 조건부 렌더링 */}
                                 {isDone ? (
                                     <div className='flex h-[46px] w-[130px] items-center justify-center rounded-[16px] bg-white/5 text-white/40 text-[13px] border border-white/5'>
                                         <span className='mr-1.5'>✓</span> 완료

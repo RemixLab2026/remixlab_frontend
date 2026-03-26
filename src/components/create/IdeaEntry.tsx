@@ -2,7 +2,7 @@ interface IdeaEntryProps {
     idea: string;
     setIdea: (value: string) => void;
     onGenerateFlow: () => void;
-    isPending: boolean; // 💡 CreatePage에서 넘겨주는 생성 상태 타입을 추가합니다.
+    isPending: boolean;
 }
 
 export default function IdeaEntry({ idea, setIdea, onGenerateFlow, isPending }: IdeaEntryProps) {
@@ -21,14 +21,14 @@ export default function IdeaEntry({ idea, setIdea, onGenerateFlow, isPending }: 
             <textarea
                 value={idea}
                 onChange={(e) => setIdea(e.target.value)}
-                disabled={isPending} // 💡 생성 중일 때는 입력을 막습니다.
+                disabled={isPending}
                 placeholder='예) 마법소녀가 밤거리에서 다친 고양이를 발견하고, 마법으로 치유해주는 이야기'
                 className='h-[220px] w-full max-w-[1000px] resize-none rounded-[24px] bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03))] px-8 py-7 text-[18px] text-white outline-none placeholder:text-white/25 shadow-[0_12px_40px_rgba(0,0,0,0.25)] backdrop-blur-md transition-opacity disabled:opacity-50'
             />
 
             <button
                 onClick={onGenerateFlow}
-                disabled={isPending || !idea.trim()} // 💡 생성 중이거나 내용이 없을 때 버튼 비활성화
+                disabled={isPending || !idea.trim()}
                 className={`mt-8 flex h-[64px] w-full max-w-[1000px] items-center justify-center rounded-[18px] text-[22px] font-semibold transition-all shadow-[0_0_22px_rgba(55,220,225,0.18)] ${
                     isPending || !idea.trim()
                         ? 'cursor-not-allowed bg-white/10 text-white/30 shadow-none'

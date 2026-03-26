@@ -87,7 +87,7 @@ export default function GeneratePlotPage() {
                       <p className='text-[16px] leading-relaxed text-white/90 font-medium'>{scene.sceneDescription}</p>
                     </div>
 
-                    {/* 💡 조건부 버튼 로직 */}
+                    {/* 조건부 버튼 로직 */}
                     {isSelected ? (
                         /* 완료된 플롯: '완료' 표시 */
                         <div className='flex h-[46px] w-[134px] items-center justify-center rounded-[16px] bg-white/5 text-[13px] font-medium text-white/40 border border-white/5'>

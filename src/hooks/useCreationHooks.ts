@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  creationApi,
+  dummyCreationApi, // 실제 API 대신 더미 API를 사용합니다.
   type CreatePhotoPayload,
   type PhotoResponse,
   type SelectPhotoPayload,
@@ -19,16 +19,16 @@ type LoosePhotoItem = {
 type LoosePhotoResponse = {
   success?: boolean;
   data?:
-    | LoosePhotoItem
-    | LoosePhotoItem[]
-    | {
-        photos?: LoosePhotoItem[];
-        images?: LoosePhotoItem[];
-        results?: LoosePhotoItem[];
-        imageUrl?: string;
-        url?: string;
-        image_url?: string;
-      };
+      | LoosePhotoItem
+      | LoosePhotoItem[]
+      | {
+    photos?: LoosePhotoItem[];
+    images?: LoosePhotoItem[];
+    results?: LoosePhotoItem[];
+    imageUrl?: string;
+    url?: string;
+    image_url?: string;
+  };
   imageUrl?: string;
   url?: string;
   image_url?: string;
@@ -41,7 +41,7 @@ export const useCreationHooks = () => {
   const [selectedScenes, setSelectedScenes] = useState<Record<number, boolean>>({});
 
   const createPlotMutation = useMutation<PlotResponse, Error, PlotRequest>({
-    mutationFn: (payload) => creationApi.createAIPlot(payload),
+    mutationFn: (payload) => dummyCreationApi.createAIPlot(payload), // 더미 API
     onSuccess: (response) => {
       if (!response.success) return;
       queryClient.invalidateQueries({ queryKey: ['plotList'] });
@@ -49,7 +49,7 @@ export const useCreationHooks = () => {
   });
 
   const createPhotoMutation = useMutation<PhotoResponse, Error, CreatePhotoPayload>({
-    mutationFn: (payload) => creationApi.createAIPhoto(payload),
+    mutationFn: (payload) => dummyCreationApi.createAIPhoto(payload), // 더미 API
     onSuccess: (response, variables) => {
       const safeResponse = response as unknown as LoosePhotoResponse;
 
@@ -57,13 +57,13 @@ export const useCreationHooks = () => {
 
       // 1) 여러 장이 배열로 오는 경우
       const multiPhotos = Array.isArray(responseData)
-        ? responseData
-        : (responseData as { photos?: LoosePhotoItem[]; images?: LoosePhotoItem[]; results?: LoosePhotoItem[] })
-            ?.photos ||
+          ? responseData
+          : (responseData as { photos?: LoosePhotoItem[]; images?: LoosePhotoItem[]; results?: LoosePhotoItem[] })
+              ?.photos ||
           (responseData as { photos?: LoosePhotoItem[]; images?: LoosePhotoItem[]; results?: LoosePhotoItem[] })
-            ?.images ||
+              ?.images ||
           (responseData as { photos?: LoosePhotoItem[]; images?: LoosePhotoItem[]; results?: LoosePhotoItem[] })
-            ?.results;
+              ?.results;
 
       if (Array.isArray(multiPhotos) && multiPhotos.length > 0) {
         const nextImages: Record<number, string> = {};
@@ -92,12 +92,12 @@ export const useCreationHooks = () => {
       if (!firstScene) return;
 
       const singleImageUrl =
-        (responseData as LoosePhotoItem)?.imageUrl ??
-        (responseData as LoosePhotoItem)?.url ??
-        (responseData as LoosePhotoItem)?.image_url ??
-        safeResponse?.imageUrl ??
-        safeResponse?.url ??
-        safeResponse?.image_url;
+          (responseData as LoosePhotoItem)?.imageUrl ??
+          (responseData as LoosePhotoItem)?.url ??
+          (responseData as LoosePhotoItem)?.image_url ??
+          safeResponse?.imageUrl ??
+          safeResponse?.url ??
+          safeResponse?.image_url;
 
       if (!singleImageUrl) return;
 
@@ -109,7 +109,7 @@ export const useCreationHooks = () => {
   });
 
   const selectPhotoMutation = useMutation<SelectPhotoResponse, Error, SelectPhotoPayload>({
-    mutationFn: (payload) => creationApi.selectPhoto(payload),
+    mutationFn: (payload) => dummyCreationApi.selectPhoto(payload), // 더미 API
     onSuccess: (response, variables) => {
       if (!response.success) return;
 
@@ -124,17 +124,17 @@ export const useCreationHooks = () => {
   });
 
   const autoGeneratePhotos = useCallback(
-    (plotData: PlotData) => {
-      const { creationId, ...restOfPlotData } = plotData;
+      (plotData: PlotData) => {
+        const { creationId, ...restOfPlotData } = plotData;
 
-      void creationId;
+        void creationId;
 
-      createPhotoMutation.mutate({
-        ...restOfPlotData,
-        scenes: plotData.scenes,
-      });
-    },
-    [createPhotoMutation]
+        createPhotoMutation.mutate({
+          ...restOfPlotData,
+          scenes: plotData.scenes,
+        });
+      },
+      [createPhotoMutation]
   );
 
   return {

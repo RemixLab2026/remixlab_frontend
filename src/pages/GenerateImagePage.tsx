@@ -1,110 +1,112 @@
 import { useLocation, useNavigate } from 'react-router-dom';
+import type { PlotData } from '@/types/creation';
 
 const IMAGE_TAGS = ['애니메이션', '시네마틱', '3D', '어린이', '캐릭터'];
 
 interface GenerateImagePageState {
-  imageUrl?: string;
-  prompt?: string;
+    plotData?: PlotData;
+    generatedImages?: Record<number, string>;
 }
 
 export default function GenerateImagePage() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const state = (location.state as GenerateImagePageState) || {};
+    const navigate = useNavigate();
+    const location = useLocation();
+    const state = (location.state as GenerateImagePageState) || {};
 
-  const { imageUrl, prompt } = state;
+    // GeneratePlotPage에서 전달받은 데이터들
+    const { plotData, generatedImages } = state;
 
-  return (
-    <section className='mx-auto max-w-[1280px] px-8 pb-16 pt-10'>
-      <div className='mb-6 flex items-center justify-between'>
-        <h2 className='text-[20px] font-semibold text-white'>이미지 생성 결과</h2>
+    return (
+        <section className='mx-auto max-w-[1280px] px-8 pb-16 pt-10'>
+            {/* 상단 헤더 및 태그 필터 */}
+            <div className='mb-8 flex items-center justify-between'>
+                <h2 className='text-[22px] font-bold text-white tracking-tight'>이미지 미리보기</h2>
 
-        <div className='flex flex-wrap gap-2'>
-          {IMAGE_TAGS.map((tag, index) => (
-            <button
-              key={tag}
-              className={
-                index === 0
-                  ? 'rounded-full bg-[linear-gradient(180deg,rgba(0,224,255,0.14),rgba(0,224,255,0.05))] px-3.5 py-1.5 text-[11px] text-cyan-300 shadow-[0_0_0_1px_rgba(34,211,238,0.55)_inset,0_0_12px_rgba(34,211,238,0.08)]'
-                  : 'rounded-full bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.025))] px-3.5 py-1.5 text-[11px] text-white/72'
-              }
-              type='button'
-            >
-              {tag}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {!imageUrl ? (
-        <div className='flex min-h-[420px] flex-col items-center justify-center rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.038),rgba(255,255,255,0.016))] text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_14px_34px_rgba(0,0,0,0.24)] backdrop-blur-md'>
-          <div className='mb-4 text-[40px] text-white/20'>🖼️</div>
-          <p className='mb-2 text-[18px] font-medium text-white'>생성된 이미지가 없습니다.</p>
-          <p className='mb-6 text-sm text-white/55'>홈에서 프롬프트를 입력하고 이미지 생성을 진행해주세요.</p>
-          <button
-            type='button'
-            onClick={() => navigate('/')}
-            className='rounded-[12px] bg-[linear-gradient(90deg,#44dde4_0%,#2bd2d7_100%)] px-5 py-3 text-[13px] font-semibold text-black transition hover:opacity-90'
-          >
-            홈으로 이동
-          </button>
-        </div>
-      ) : (
-        <div className='grid grid-cols-1 gap-4 lg:grid-cols-[1.2fr_0.8fr]'>
-          {/* 이미지 영역 */}
-          <div className='relative overflow-hidden rounded-[18px] bg-[linear-gradient(180deg,rgba(255,255,255,0.038),rgba(255,255,255,0.016))] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_14px_34px_rgba(0,0,0,0.24)] backdrop-blur-md'>
-            <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_42%_0%,rgba(35,209,215,0.10),transparent_24%),radial-gradient(circle_at_52%_58%,rgba(255,255,255,0.03),transparent_28%),linear-gradient(90deg,rgba(255,255,255,0.008),transparent_28%,rgba(255,255,255,0.018)_62%,rgba(0,0,0,0.06)_100%)]' />
-
-            <div className='relative overflow-hidden rounded-[14px]'>
-              <img src={imageUrl} alt='AI 생성 이미지' className='h-[520px] w-full rounded-[14px] object-cover' />
-            </div>
-          </div>
-
-          {/* 정보 영역 */}
-          <div className='relative overflow-hidden rounded-[18px] bg-[linear-gradient(180deg,rgba(255,255,255,0.038),rgba(255,255,255,0.016))] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_14px_34px_rgba(0,0,0,0.24)] backdrop-blur-md'>
-            <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_42%_0%,rgba(35,209,215,0.10),transparent_24%),radial-gradient(circle_at_52%_58%,rgba(255,255,255,0.03),transparent_28%),linear-gradient(90deg,rgba(255,255,255,0.008),transparent_28%,rgba(255,255,255,0.018)_62%,rgba(0,0,0,0.06)_100%)]' />
-
-            <div className='relative'>
-              <p className='mb-2 text-[12px] font-semibold tracking-[0.18em] text-cyan-300'>PROMPT</p>
-              <div className='rounded-[14px] border border-white/10 bg-white/[0.03] p-4'>
-                <p className='text-[15px] leading-7 text-white/88'>{prompt || '입력된 프롬프트가 없습니다.'}</p>
-              </div>
-
-              <div className='mt-6'>
-                <p className='mb-3 text-[12px] font-semibold tracking-[0.18em] text-cyan-300'>RESULT</p>
-                <div className='space-y-3 rounded-[14px] border border-white/10 bg-white/[0.03] p-4 text-sm text-white/72'>
-                  <div className='flex items-center justify-between'>
-                    <span>생성 상태</span>
-                    <span className='font-medium text-white'>완료</span>
-                  </div>
-                  <div className='flex items-center justify-between'>
-                    <span>출력 타입</span>
-                    <span className='font-medium text-white'>AI 이미지</span>
-                  </div>
+                <div className='flex gap-2'>
+                    {IMAGE_TAGS.map((tag, index) => (
+                        <button
+                            key={tag}
+                            className={
+                                index === 0
+                                    ? 'cursor-pointer rounded-full border border-cyan-500/50 bg-cyan-500/10 px-4 py-1.5 text-[12px] text-cyan-300 shadow-[0_0_12px_rgba(34,211,238,0.1)]'
+                                    : 'cursor-pointer rounded-full bg-white/5 px-4 py-1.5 text-[12px] text-white/50 hover:text-white transition-colors'
+                            }
+                            type='button'
+                        >
+                            {tag}
+                        </button>
+                    ))}
                 </div>
-              </div>
-
-              <div className='mt-6 flex gap-3'>
-                <button
-                  type='button'
-                  onClick={() => navigate('/')}
-                  className='flex-1 rounded-[12px] border border-white/10 bg-white/5 py-3 text-[13px] font-semibold text-white transition hover:bg-white/10'
-                >
-                  다시 생성하기
-                </button>
-
-                <a
-                  href={imageUrl}
-                  download
-                  className='flex-1 rounded-[12px] bg-[linear-gradient(90deg,#44dde4_0%,#2bd2d7_100%)] py-3 text-center text-[13px] font-semibold text-black transition hover:opacity-90'
-                >
-                  이미지 다운로드
-                </a>
-              </div>
             </div>
-          </div>
-        </div>
-      )}
-    </section>
-  );
+
+            {!plotData ? (
+                /* 데이터가 없을 때 표시할 빈 화면 */
+                <div className='flex min-h-[400px] flex-col items-center justify-center rounded-[24px] border border-white/5 bg-white/[0.02] backdrop-blur-xl'>
+                    <p className='text-white/40'>표시할 이미지 데이터가 없습니다.</p>
+                    <button
+                        onClick={() => navigate('/')}
+                        className='mt-4 text-cyan-400 text-sm hover:underline cursor-pointer'
+                    >
+                        홈으로 돌아가기
+                    </button>
+                </div>
+            ) : (
+                /* 이미지와 동일한 3열 격자 레이아웃 (반응형 적용) */
+                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                    {plotData.scenes.map((scene) => {
+                        const currentImageUrl = generatedImages?.[scene.sceneNumber];
+
+                        return (
+                            <div
+                                key={scene.sceneNumber}
+                                className='group relative flex cursor-pointer flex-col rounded-[24px] border border-white/10 bg-[#0c1216] p-4 shadow-xl transition-all duration-300 hover:scale-[1.02] hover:border-white/20 hover:bg-[#11181d]'
+                            >
+                                {/* 카드 상단 이미지 영역 */}
+                                <div className='relative aspect-[16/10] w-full overflow-hidden rounded-[18px] bg-[#161b21]'>
+                                    {currentImageUrl ? (
+                                        <img
+                                            src={currentImageUrl}
+                                            alt={`장면 ${scene.sceneNumber}`}
+                                            className='h-full w-full object-cover transition-transform duration-500 group-hover:scale-105'
+                                        />
+                                    ) : (
+                                        /* 이미지 로딩 실패나 없을 때 아이콘 표시 */
+                                        <div className='flex h-full w-full items-center justify-center bg-white/[0.03]'>
+                                            <svg className="h-10 w-10 text-white/10" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5-7l-3 3.72L9 13l-3 4h12l-4-5z" />
+                                            </svg>
+                                        </div>
+                                    )}
+                                    {/* 이미지 위 오버레이 */}
+                                    <div className='absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100' />
+                                </div>
+
+                                {/* 카드 하단 텍스트 영역 */}
+                                <div className='mt-5 flex items-start px-1'>
+                                    <p className='text-[15px] leading-relaxed'>
+                                        <span className='mr-1.5 font-bold text-cyan-400'>장면 {scene.sceneNumber}.</span>
+                                        <span className='font-medium text-white/90 line-clamp-2'>
+                      {scene.sceneDescription}
+                    </span>
+                                    </p>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+
+            {/* 하단 액션 버튼 */}
+            {plotData && (
+                <div className='mt-12 flex justify-center'>
+                    <button
+                        onClick={() => navigate('/')}
+                        className='cursor-pointer rounded-full border border-white/10 bg-white/5 px-10 py-3.5 text-[14px] font-semibold text-white/80 transition-all hover:bg-white/10'
+                    >
+                        다시 생성하기
+                    </button>
+                </div>
+            )}
+        </section>
+    );
 }

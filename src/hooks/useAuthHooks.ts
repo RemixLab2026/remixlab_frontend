@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query'; // 🌟 useQuery, useQueryClient 제거
+import { useMutation } from '@tanstack/react-query'; // useQuery, useQueryClient 제거
 import { useNavigate } from 'react-router-dom';
 import { authApi } from '@/apis/auth';
 import { useAuthStore } from '@/store/authStore';

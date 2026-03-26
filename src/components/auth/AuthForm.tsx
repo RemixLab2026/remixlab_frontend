@@ -54,7 +54,7 @@ export default function AuthForm({ mode, isPending, onSubmit }: AuthFormProps) {
                 type='submit'
                 disabled={!isFilled || isPending}
                 className={[
-                    'mt-2 flex h-[52px] w-full items-center justify-center rounded-[14px] text-[14px] font-semibold transition',
+                    'cursor-pointer mt-2 flex h-[52px] w-full items-center justify-center rounded-[14px] text-[14px] font-semibold transition',
                     isFilled
                         ? 'bg-cyan-400 text-[#041019] hover:brightness-110'
                         : 'border border-white/10 bg-white/10 text-white/60',

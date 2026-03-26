@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-// 🌟 프로젝트 아이템 타입 정의
 interface Project {
   id: number;
   title: string;
@@ -13,10 +12,26 @@ export default function DashboardPage() {
   const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
 
-  // 🌟 페이지 로드 시 localStorage에서 저장된 프로젝트 가져오기
+  // 🌟 가급적 Effect 내부 로직을 안전하게 처리하고
+  // 초기 렌더링 시 데이터가 꼬이지 않도록 합니다.
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('my_projects') || '[]');
-    setProjects(saved);
+    const loadProjects = () => {
+      try {
+        const savedData = localStorage.getItem('my_projects');
+        if (savedData) {
+          const parsedData = JSON.parse(savedData);
+          if (Array.isArray(parsedData)) {
+            setProjects(parsedData);
+          }
+        }
+      } catch (error) {
+        console.error('프로젝트를 불러오는 중 오류가 발생했습니다:', error);
+        // 파싱 에러 시 빈 배열로 초기화하거나 무시
+        setProjects([]);
+      }
+    };
+
+    loadProjects();
   }, []);
 
   const currentXp = 70;
@@ -49,15 +64,13 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* 카드 영역 */}
         <div className='mt-5 grid grid-cols-2 gap-5'>
           {/* 내 프로젝트 카드 */}
-          <div className='relative min-h-[320px] overflow-hidden rounded-[20px] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015))] px-6 py-6 shadow-xl border border-white/5 backdrop-blur-md'>
+          <div className='relative min-h-[320px] overflow-hidden rounded-[20px] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015))] px-6 py-6 border border-white/5 backdrop-blur-md shadow-xl'>
             <p className='text-[11px] text-white/55 mb-5'>내 프로젝트 ({projects.length})</p>
 
             <div className='relative flex h-[calc(100%-40px)] flex-col'>
               {projects.length > 0 ? (
-                  /* 🌟 프로젝트 리스트 렌더링 */
                   <div className='space-y-3 overflow-y-auto max-h-[220px] pr-2 custom-scrollbar'>
                     {projects.map((project) => (
                         <div
@@ -79,7 +92,6 @@ export default function DashboardPage() {
                     ))}
                   </div>
               ) : (
-                  /* 기존 비어있는 화면 */
                   <div className='flex flex-1 flex-col items-center justify-center text-center'>
                     <div className='mb-4 text-[64px] leading-none text-white/16'>✦</div>
                     <p className='text-[14px] text-white/72'>아직 프로젝트가 없어요</p>

@@ -1,5 +1,5 @@
 import { useQuestHooks } from '@/hooks/useQuestHooks';
-import LevelProgressCard from '@/components/common/LevelProgressCard'; // 🌟 공통 컴포넌트 임포트
+import LevelProgressCard from '@/components/common/LevelProgressCard';
 
 type QuestDetail = {
   name: string;
@@ -8,7 +8,6 @@ type QuestDetail = {
   highlight: string | boolean;
 };
 
-// 프론트엔드에서 관리하는 퀘스트 상세 정보
 const QUEST_DETAILS: QuestDetail[] = [
   { name: '첫 스토리 생성', description: '첫 스토리를 생성해보세요.', reward: 5, highlight: false },
   { name: '아이디어 탐험가', description: '3개의 프로젝트를 만들어보세요.', reward: 10, highlight: false },
@@ -22,37 +21,39 @@ const QUEST_DETAILS: QuestDetail[] = [
 
 function QuestLevelBadge({ active }: { active?: boolean }) {
   return (
-      <div
-          className={`relative flex h-full w-[120px] shrink-0 flex-col items-center justify-center overflow-hidden rounded-[14px] ${
-              active
-                  ? 'bg-[linear-gradient(180deg,#41dce3_0%,#25c5cc_58%,#169ea7_100%)] shadow-[0_10px_24px_rgba(24,196,203,0.16)]'
-                  : 'bg-[linear-gradient(180deg,rgba(11,75,79,0.88),rgba(7,45,49,0.94))]'
-          }`}
-      >
-        <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(255,255,255,0.18),transparent_34%),linear-gradient(180deg,transparent,rgba(0,0,0,0.08))]' />
-        <div className='relative text-[22px] text-white/90'>
-          <img src='/lock.png' alt='잠금' className='h-[28px] w-[28px] object-contain opacity-90' />
-        </div>
-        <span className='relative mt-1 text-[11px] text-white/90'>Level 1</span>
+    <div
+      className={`relative flex h-[82px] w-full shrink-0 flex-row items-center justify-center gap-2 overflow-hidden rounded-[12px] md:h-full md:w-[120px] md:flex-col md:gap-0 md:rounded-[14px] ${
+        active
+          ? 'bg-[linear-gradient(180deg,#41dce3_0%,#25c5cc_58%,#169ea7_100%)] shadow-[0_10px_24px_rgba(24,196,203,0.16)]'
+          : 'bg-[linear-gradient(180deg,rgba(11,75,79,0.88),rgba(7,45,49,0.94))]'
+      }`}
+    >
+      <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(255,255,255,0.18),transparent_34%),linear-gradient(180deg,transparent,rgba(0,0,0,0.08))]' />
+      <div className='relative text-[22px] text-white/90'>
+        <img
+          src='/lock.png'
+          alt='잠금'
+          className='h-[24px] w-[24px] object-contain opacity-90 md:h-[28px] md:w-[28px]'
+        />
       </div>
+      <span className='relative text-[11px] text-white/90 md:mt-1'>Level 1</span>
+    </div>
   );
 }
 
 function RewardPill({ reward }: { reward: number }) {
   return (
-      <div className='flex h-[22px] gap-2 items-center rounded-full bg-[linear-gradient(180deg,rgba(255,255,255,0.10),rgba(255,255,255,0.05))] px-2.5 text-[10px] text-white/82 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]'>
-        <img src='/token.png' alt='토큰' className='h-[10px] w-[10px] object-contain opacity-90' />
-        <span className='text-sm'>+{reward}</span>
-      </div>
+    <div className='flex h-[22px] items-center gap-1.5 rounded-full bg-[linear-gradient(180deg,rgba(255,255,255,0.10),rgba(255,255,255,0.05))] px-2.5 text-[10px] text-white/82 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]'>
+      <img src='/token.png' alt='토큰' className='h-[10px] w-[10px] object-contain opacity-90' />
+      <span className='text-[11px] md:text-sm'>+{reward}</span>
+    </div>
   );
 }
 
 export default function QuestPage() {
-  // 커스텀 훅을 사용하여 데이터, 로딩상태, 에러상태를 가져옵니다.
   const { myQuestsQuery } = useQuestHooks();
   const { data: apiQuests = [], isLoading, isError } = myQuestsQuery;
 
-  // API 데이터와 정적 데이터를 조합하여 최종 퀘스트 목록 생성
   const quests = QUEST_DETAILS.map((detail) => {
     const isUnlocked = apiQuests.some((apiQuest) => apiQuest.name === detail.name);
     return {
@@ -64,69 +65,73 @@ export default function QuestPage() {
 
   if (isLoading) {
     return (
-        <section className='mx-auto max-w-[1280px] flex justify-center px-8 pb-16 pt-32'>
-          <div className='text-sm text-white/60'>퀘스트 정보를 불러오는 중입니다...</div>
-        </section>
+      <section className='mx-auto flex max-w-[1280px] justify-center px-4 pb-12 pt-24 md:px-8 md:pb-16 md:pt-32'>
+        <div className='text-sm text-white/60'>퀘스트 정보를 불러오는 중입니다...</div>
+      </section>
     );
   }
 
   if (isError) {
     return (
-        <section className='mx-auto max-w-[1280px] flex justify-center px-8 pb-16 pt-32'>
-          <div className='text-sm text-red-400'>퀘스트 정보를 불러오는데 실패했습니다.</div>
-        </section>
+      <section className='mx-auto flex max-w-[1280px] justify-center px-4 pb-12 pt-24 md:px-8 md:pb-16 md:pt-32'>
+        <div className='text-sm text-red-400'>퀘스트 정보를 불러오는데 실패했습니다.</div>
+      </section>
     );
   }
 
   return (
-      <section className='mx-auto max-w-[1280px] px-8 pb-16 pt-10'>
+    <section className='mx-auto max-w-[1280px] px-4 pb-12 pt-6 md:px-8 md:pb-16 md:pt-10'>
+      <LevelProgressCard />
 
-        {/* 🌟 공통 레벨 진행도 컴포넌트 렌더링 */}
-        <LevelProgressCard />
+      <div className='mt-6 md:mt-7'>
+        <h2 className='mb-4 text-[16px] font-semibold text-white md:text-[18px]'>퀘스트 보드</h2>
 
-        {/* 퀘스트 보드 영역 */}
-        <div className='mt-7'>
-          <h2 className='mb-4 text-[18px] font-semibold text-white'>퀘스트 보드</h2>
+        <div className='grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-x-4 md:gap-y-4'>
+          {quests.map((quest, index) => (
+            <div key={quest.name} className='flex flex-col gap-3 md:flex-row'>
+              <QuestLevelBadge active={index === 0} />
 
-          <div className='grid grid-cols-2 gap-x-4 gap-y-4'>
-            {quests.map((quest, index) => (
-                <div key={quest.name} className='flex gap-3'>
-                  <QuestLevelBadge active={index === 0} />
+              <div className='relative min-h-[96px] flex-1 overflow-hidden rounded-[12px] bg-[linear-gradient(180deg,rgba(255,255,255,0.038),rgba(255,255,255,0.016))] px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_14px_34px_rgba(0,0,0,0.24)] backdrop-blur-md md:min-h-[90px] md:rounded-[14px] md:px-5'>
+                <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_42%_0%,rgba(35,209,215,0.10),transparent_24%),radial-gradient(circle_at_52%_58%,rgba(255,255,255,0.025),transparent_28%),linear-gradient(90deg,rgba(255,255,255,0.008),transparent_28%,rgba(255,255,255,0.015)_62%,rgba(0,0,0,0.06)_100%)]' />
 
-                  <div className='relative min-h-[90px] flex-1 overflow-hidden rounded-[14px] bg-[linear-gradient(180deg,rgba(255,255,255,0.038),rgba(255,255,255,0.016))] px-5 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_14px_34px_rgba(0,0,0,0.24)] backdrop-blur-md'>
-                    <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_42%_0%,rgba(35,209,215,0.10),transparent_24%),radial-gradient(circle_at_52%_58%,rgba(255,255,255,0.025),transparent_28%),linear-gradient(90deg,rgba(255,255,255,0.008),transparent_28%,rgba(255,255,255,0.015)_62%,rgba(0,0,0,0.06)_100%)]' />
-
-                    <div className='relative flex items-start justify-between gap-3'>
-                      <div className='min-w-0'>
-                        <div className='flex items-center gap-2'>
+                <div className='relative flex flex-col gap-3 md:flex-row md:items-start md:justify-between'>
+                  <div className='min-w-0'>
+                    <div className='flex items-center gap-2'>
                       <span className='text-[12px] text-white/82'>
                         {quest.locked ? (
-                            <img src='/lock.png' alt='잠금' className='h-[14px] w-[14px] object-contain opacity-90' />
+                          <img src='/lock.png' alt='잠금' className='h-[14px] w-[14px] object-contain opacity-90' />
                         ) : (
-                            <img src='/success.png' alt='완료' className='h-[14px] w-[14px] object-contain opacity-90' />
+                          <img src='/success.png' alt='완료' className='h-[14px] w-[14px] object-contain opacity-90' />
                         )}
                       </span>
-                          <h3 className={`text-[14px] font-medium ${quest.locked ? 'text-white/45' : 'text-white/90'}`}>
-                            {quest.title}
-                          </h3>
-                        </div>
 
-                        <p className={`mt-2 text-[12px] ${quest.locked ? 'text-white/28' : 'text-white/45'}`}>
-                          {quest.description}
-                        </p>
-
-                        {quest.highlight && typeof quest.highlight === 'string' && (
-                            <p className='mt-1.5 text-[11px] text-cyan-400/90'>{quest.highlight}</p>
-                        )}
-                      </div>
-
-                      <RewardPill reward={quest.reward} />
+                      <h3
+                        className={`text-[13px] font-medium md:text-[14px] ${quest.locked ? 'text-white/45' : 'text-white/90'}`}
+                      >
+                        {quest.title}
+                      </h3>
                     </div>
+
+                    <p
+                      className={`mt-2 text-[11px] leading-relaxed md:text-[12px] ${quest.locked ? 'text-white/28' : 'text-white/45'}`}
+                    >
+                      {quest.description}
+                    </p>
+
+                    {quest.highlight && typeof quest.highlight === 'string' && (
+                      <p className='mt-1.5 text-[10px] text-cyan-400/90 md:text-[11px]'>{quest.highlight}</p>
+                    )}
+                  </div>
+
+                  <div className='self-start md:self-auto'>
+                    <RewardPill reward={quest.reward} />
                   </div>
                 </div>
-            ))}
-          </div>
+              </div>
+            </div>
+          ))}
         </div>
-      </section>
+      </div>
+    </section>
   );
 }

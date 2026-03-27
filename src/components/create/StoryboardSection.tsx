@@ -1,147 +1,140 @@
 import type { Scene } from '@/types/creation';
-import StepNavigation from '@/components/create/StepNavigation'; // 🌟 StepNavigation 임포트
+import StepNavigation from '@/components/create/StepNavigation';
 
 interface StoryboardSectionProps {
-    items: Scene[];
-    generatedImages: Record<number, string>;
-    selectedScenes: Record<number, boolean>;
-    isPhotoPending: boolean;
-    pendingSceneNumber?: number;
-    isSelectPending: boolean;
-    onSelectImage: (num: number) => void;
-    onGoImage: () => void;
-    showStepNav?: boolean; // 🌟 추가된 prop
+  items: Scene[];
+  generatedImages: Record<number, string>;
+  selectedScenes: Record<number, boolean>;
+  isPhotoPending: boolean;
+  pendingSceneNumber?: number;
+  isSelectPending: boolean;
+  onSelectImage: (num: number) => void;
+  onGoImage: () => void;
+  showStepNav?: boolean;
 }
 
 export default function StoryboardSection({
-                                              items,
-                                              generatedImages,
-                                              selectedScenes,
-                                              isPhotoPending,
-                                              pendingSceneNumber,
-                                              isSelectPending,
-                                              onSelectImage,
-                                              onGoImage,
-                                              showStepNav = true, // 기본값 true 설정
-                                          }: StoryboardSectionProps) {
-    // 선택된 씬이 하나라도 있는지 확인 (버튼 활성화 조건)
-    const hasSelectedAny = Object.keys(selectedScenes).length > 0;
+  items,
+  generatedImages,
+  selectedScenes,
+  isPhotoPending,
+  pendingSceneNumber,
+  isSelectPending,
+  onSelectImage,
+  onGoImage,
+  showStepNav = true,
+}: StoryboardSectionProps) {
+  const hasSelectedAny = Object.keys(selectedScenes).length > 0;
 
-    return (
-        <section className='pb-16 pt-8 text-white'>
-            {/* 🌟 StepNavigation 추가 */}
-            {showStepNav && <StepNavigation currentStep='storyboard' />}
+  return (
+    <section className='pb-12 pt-6 text-white md:pb-16 md:pt-8'>
+      {/* StepNavigation */}
+      {showStepNav && <StepNavigation currentStep='storyboard' />}
 
-            <div className='mb-8 mt-6 flex items-center justify-between'>
-                <h2 className='text-[22px] font-bold tracking-tight text-white'>스토리보드</h2>
-            </div>
+      {/* 헤더 */}
+      <div className='mb-6 mt-4 md:mb-8 md:mt-6'>
+        <h2 className='text-[18px] font-bold tracking-tight md:text-[22px]'>스토리보드</h2>
+      </div>
 
-            {/* 세로형 리스트 레이아웃 */}
-            <div className='space-y-4'>
-                {items.map((scene) => {
-                    const isReady = !!generatedImages[scene.sceneNumber];
-                    const isDone = !!selectedScenes[scene.sceneNumber];
-                    const isGenerating = isPhotoPending && pendingSceneNumber === scene.sceneNumber;
+      {/* 리스트 */}
+      <div className='space-y-4'>
+        {items.map((scene) => {
+          const isReady = !!generatedImages[scene.sceneNumber];
+          const isDone = !!selectedScenes[scene.sceneNumber];
+          const isGenerating = isPhotoPending && pendingSceneNumber === scene.sceneNumber;
 
-                    return (
-                        <div key={scene.sceneNumber} className='flex gap-5'>
-                            {/* 왼쪽 인덱스 박스 (에메랄드 그라데이션) */}
-                            <div className='flex h-[110px] w-[140px] shrink-0 flex-col items-center justify-center rounded-[16px] bg-[linear-gradient(180deg,#60b5b1_0%,#439d98_100%)] shadow-md'>
-                                <span className='text-[30px] font-bold leading-none text-white'>{scene.sceneNumber}</span>
-                                <span className='mt-2 text-[13px] font-medium text-white/90'>
+          return (
+            <div key={scene.sceneNumber} className='flex flex-col gap-3 md:flex-row md:gap-5'>
+              {/* 번호 박스 */}
+              <div className='flex h-[90px] w-full shrink-0 flex-row items-center justify-center gap-3 rounded-[14px] bg-[linear-gradient(180deg,#60b5b1_0%,#439d98_100%)] px-4 shadow-md md:h-[110px] md:w-[140px] md:flex-col md:gap-0 md:rounded-[16px]'>
+                <span className='text-[26px] font-bold leading-none md:text-[30px]'>{scene.sceneNumber}</span>
+                <span className='text-[12px] font-medium text-white/90 md:mt-2 md:text-[13px]'>
                   {scene.emotion || '분위기'}
                 </span>
-                            </div>
+              </div>
 
-                            {/* 정보 카드 (리스트 아이템 바디) */}
-                            <div className='flex flex-1 items-center justify-between rounded-[16px] border border-white/5 bg-[#0c1216] px-8 py-5 shadow-sm'>
-                                <div className='flex flex-1 items-center pr-8'>
-                                    {/* 시각 요소 태그 */}
-                                    <div className='flex w-[240px] shrink-0 flex-wrap gap-2 overflow-hidden'>
-                                        {scene.visualElements.split(',').slice(0, 2).map((tag, i) => (
-                                            <span
-                                                key={i}
-                                                className='whitespace-nowrap rounded-full border border-white/5 bg-[#1c2429] px-3.5 py-1.5 text-[12px] text-white/70'
-                                            >
-                        {tag.trim()}
-                      </span>
-                                        ))}
-                                    </div>
+              {/* 카드 */}
+              <div className='flex flex-1 flex-col gap-4 rounded-[14px] border border-white/5 bg-[#0c1216] px-4 py-4 shadow-sm md:flex-row md:items-center md:justify-between md:gap-0 md:px-8 md:py-5 md:rounded-[16px]'>
+                {/* 텍스트 영역 */}
+                <div className='flex flex-1 flex-col gap-3 md:flex-row md:items-center md:pr-8'>
+                  {/* 태그 */}
+                  <div className='flex w-full flex-wrap gap-2 md:w-[240px] md:shrink-0'>
+                    {scene.visualElements
+                      .split(',')
+                      .slice(0, 2)
+                      .map((tag, i) => (
+                        <span
+                          key={i}
+                          className='rounded-full border border-white/5 bg-[#1c2429] px-3 py-1 text-[11px] text-white/70 md:px-3.5 md:py-1.5 md:text-[12px]'
+                        >
+                          {tag.trim()}
+                        </span>
+                      ))}
+                  </div>
 
-                                    {/* 수직 구분선 */}
-                                    <div className='mx-6 h-8 w-px bg-white/10'></div>
+                  {/* 구분선 (데스크탑만) */}
+                  <div className='hidden h-8 w-px bg-white/10 md:mx-6 md:block' />
 
-                                    {/* 씬 설명 */}
-                                    <p className='text-[15px] font-medium leading-relaxed text-white/90'>
-                                        {scene.sceneDescription}
-                                    </p>
-                                </div>
+                  {/* 설명 */}
+                  <p className='text-[14px] leading-relaxed text-white/90 md:text-[15px]'>{scene.sceneDescription}</p>
+                </div>
 
-                                {/* 버튼 조건부 로직 */}
-                                {isDone ? (
-                                    /* 1) 완료된 플롯: '완료' 표시 */
-                                    <div className='flex h-[44px] w-[110px] items-center justify-center rounded-[12px] bg-[#22282c] text-[13px] font-medium text-white/80'>
-                                        <svg
-                                            className='mr-1.5 h-4 w-4 opacity-70'
-                                            fill='none'
-                                            stroke='currentColor'
-                                            viewBox='0 0 24 24'
-                                        >
-                                            <path
-                                                strokeLinecap='round'
-                                                strokeLinejoin='round'
-                                                strokeWidth='2.5'
-                                                d='M5 13l4 4L19 7'
-                                            ></path>
-                                        </svg>
-                                        <span className='text-[11px]'>완료</span>
-                                    </div>
-                                ) : (
-                                    /* 2) 미완료 플롯: '이미지 생성' 버튼 */
-                                    <button
-                                        onClick={() => onSelectImage(scene.sceneNumber)}
-                                        disabled={!isReady || isSelectPending}
-                                        className='flex h-[44px] w-[140px] cursor-pointer items-center justify-center rounded-[12px] bg-[#161e22] text-[12px] font-medium text-white/80 transition-all hover:bg-[#1f292e] disabled:cursor-not-allowed disabled:opacity-50'
-                                    >
-                    <span className='text-[11px]'>
-                      {isGenerating || !isReady ? '준비 중...' : isSelectPending ? '처리 중...' : '이미지 생성'}
-                    </span>
-                                        {!isSelectPending && isReady && !isGenerating && (
-                                            <div className='ml-2 flex items-center gap-1 rounded bg-white/10 px-1.5 py-0.5'>
-                                                <img src='/token.png' alt='토큰' className='h-[11px] w-[11px] opacity-90' />
-                                                <span className='text-[11px] font-semibold text-white'>3</span>
-                                            </div>
-                                        )}
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
-
-            {/* 🌟 하단 메인 액션 버튼 (우측 정렬 및 화살표 추가) */}
-            <div className='mt-12 flex justify-end'>
-                <button
-                    onClick={onGoImage}
-                    disabled={!hasSelectedAny}
-                    className={`group flex items-center justify-center gap-2 rounded-[14px] px-8 py-3.5 text-[15px] font-bold transition-all ${
-                        hasSelectedAny
-                            ? 'cursor-pointer bg-[linear-gradient(90deg,#44dde4_0%,#2bd2d7_100%)] text-black shadow-[0_0_20px_rgba(55,220,225,0.3)] hover:opacity-90'
-                            : 'cursor-not-allowed bg-white/10 text-white/30'
-                    }`}
-                >
-                    이미지 확인
-                    <svg
-                        className={`h-4 w-4 transition-transform ${hasSelectedAny ? 'group-hover:translate-x-1' : ''}`}
-                        fill='none'
-                        stroke='currentColor'
-                        viewBox='0 0 24 24'
+                {/* 버튼 */}
+                <div className='flex w-full md:w-auto md:justify-end'>
+                  {isDone ? (
+                    <div className='flex h-[42px] w-full items-center justify-center rounded-[10px] bg-[#22282c] text-[12px] font-medium text-white/80 md:h-[44px] md:w-[110px] md:text-[13px] md:rounded-[12px]'>
+                      <svg className='mr-1.5 h-4 w-4 opacity-70' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2.5' d='M5 13l4 4L19 7' />
+                      </svg>
+                      완료
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => onSelectImage(scene.sceneNumber)}
+                      disabled={!isReady || isSelectPending}
+                      className='flex h-[42px] w-full items-center justify-center rounded-[10px] bg-[#161e22] text-[11px] font-medium text-white/80 transition-all hover:bg-[#1f292e] disabled:cursor-not-allowed disabled:opacity-50 md:h-[44px] md:w-[140px] md:text-[12px] md:rounded-[12px]'
                     >
-                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2.5' d='M5 12h14M12 5l7 7-7 7' />
-                    </svg>
-                </button>
+                      <span>
+                        {isGenerating || !isReady ? '준비 중...' : isSelectPending ? '처리 중...' : '이미지 생성'}
+                      </span>
+
+                      {!isSelectPending && isReady && !isGenerating && (
+                        <div className='ml-2 flex items-center gap-1 rounded bg-white/10 px-1.5 py-0.5'>
+                          <img src='/token.png' alt='토큰' className='h-[10px] w-[10px] md:h-[11px] md:w-[11px]' />
+                          <span className='text-[10px] font-semibold md:text-[11px]'>3</span>
+                        </div>
+                      )}
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
-        </section>
-    );
+          );
+        })}
+      </div>
+
+      {/* 하단 버튼 */}
+      <div className='mt-10 flex justify-center md:mt-12 md:justify-end'>
+        <button
+          onClick={onGoImage}
+          disabled={!hasSelectedAny}
+          className={`group flex w-full items-center justify-center gap-2 rounded-[12px] px-6 py-3 text-[13px] font-bold transition-all md:w-auto md:rounded-[14px] md:px-8 md:py-3.5 md:text-[15px] ${
+            hasSelectedAny
+              ? 'cursor-pointer bg-[linear-gradient(90deg,#44dde4_0%,#2bd2d7_100%)] text-black shadow-[0_0_20px_rgba(55,220,225,0.3)] hover:opacity-90'
+              : 'cursor-not-allowed bg-white/10 text-white/30'
+          }`}
+        >
+          이미지 확인
+          <svg
+            className={`h-4 w-4 transition-transform ${hasSelectedAny ? 'group-hover:translate-x-1' : ''}`}
+            fill='none'
+            stroke='currentColor'
+            viewBox='0 0 24 24'
+          >
+            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2.5' d='M5 12h14M12 5l7 7-7 7' />
+          </svg>
+        </button>
+      </div>
+    </section>
+  );
 }

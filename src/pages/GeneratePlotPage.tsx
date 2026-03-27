@@ -10,19 +10,12 @@ export default function GeneratePlotPage() {
   const navigate = useNavigate();
   const hasStartedAutoRef = useRef(false);
 
-  // 전체 로딩 상태를 관리하는 State
   const [isGlobalLoading, setIsGlobalLoading] = useState(true);
 
-  const {
-    createPhotoMutation,
-    selectPhotoMutation,
-    selectedScenes,
-    autoGeneratePhotos,
-  } = useCreationHooks();
+  const { createPhotoMutation, selectPhotoMutation, selectedScenes, autoGeneratePhotos } = useCreationHooks();
 
   const plotData = location.state?.plotData as PlotData | undefined;
 
-  // 1. 진입 시 모든 플롯 사진 자동 생성 (백그라운드)
   useEffect(() => {
     if (plotData && !hasStartedAutoRef.current) {
       autoGeneratePhotos(plotData);
@@ -32,9 +25,7 @@ export default function GeneratePlotPage() {
     }
   }, [plotData, autoGeneratePhotos, navigate]);
 
-  // 2. 사진 생성이 진행 중인지 감지하여 로딩 상태 해제
   useEffect(() => {
-    // 자동 생성이 시작되었고, mutation의 pending 상태가 끝났을 때 로딩 해제
     if (hasStartedAutoRef.current && !createPhotoMutation.isPending) {
       setIsGlobalLoading(false);
     }
@@ -42,7 +33,6 @@ export default function GeneratePlotPage() {
 
   if (!plotData) return null;
 
-  // 3. 버튼 클릭 시 "사진 선택" API 연동 (UI 표기는 '이미지 생성'으로 통일)
   const handleSelectImage = (sceneNumber: number) => {
     if (!plotData || typeof plotData.creationId !== 'number') return;
     selectPhotoMutation.mutate({
@@ -51,125 +41,123 @@ export default function GeneratePlotPage() {
     });
   };
 
-  // 4. 전역 로딩 화면 (이미지 생성 중일 때 표시)
   if (isGlobalLoading) {
     return (
-        <section className='flex min-h-[calc(100vh-88px)] flex-col items-center justify-center'>
-          <div className='h-12 w-12 animate-spin rounded-full border-[4px] border-cyan-500/20 border-t-cyan-400'></div>
-          <p className='mt-6 text-[15px] font-medium text-white/70'>
-            스토리보드에 필요한 이미지를 생성하고 있습니다...
-          </p>
-        </section>
+      <section className='flex min-h-[calc(100vh-88px)] flex-col items-center justify-center px-6 text-center'>
+        <div className='h-12 w-12 animate-spin rounded-full border-[4px] border-cyan-500/20 border-t-cyan-400' />
+        <p className='mt-6 text-[14px] font-medium text-white/70 md:text-[15px]'>
+          스토리보드에 필요한 이미지를 생성하고 있습니다...
+        </p>
+      </section>
     );
   }
 
   return (
-      <section className='mx-auto max-w-[1280px] px-8 pb-16 pt-10'>
-        {/* 헤더 부분 */}
-        <div className='mb-8 flex items-end justify-between'>
-          <div>
-            <h1 className='mb-2 text-[28px] font-bold text-white'>{plotData.title}</h1>
-            <p className='text-[15px] text-white/50'>
-              장르: <span className='text-white/80'>{plotData.genre}</span> | 분위기:{' '}
-              <span className='text-white/80'>{plotData.mood}</span>
-            </p>
-          </div>
-          <div className='flex gap-2'>
-            {STORY_TAGS.map((tag, idx) => (
-                <button
-                    key={idx}
-                    className={
-                      idx === 0
-                          ? 'rounded-full border border-cyan-500/50 bg-cyan-500/10 px-4 py-1.5 text-[12px] text-cyan-300 shadow-[0_0_12px_rgba(34,211,238,0.1)]'
-                          : 'rounded-full bg-white/5 px-4 py-1.5 text-[12px] text-white/70'
-                    }
-                >
-                  {tag}
-                </button>
-            ))}
-          </div>
+    <section className='mx-auto max-w-[1280px] px-4 pb-12 pt-6 md:px-8 md:pb-16 md:pt-10'>
+      {/* 헤더 */}
+      <div className='mb-6 flex flex-col gap-4 md:mb-8 md:flex-row md:items-end md:justify-between'>
+        <div className='min-w-0'>
+          <h1 className='mb-2 break-words text-[22px] font-bold text-white md:text-[28px]'>{plotData.title}</h1>
+          <p className='text-[13px] leading-relaxed text-white/50 md:text-[15px]'>
+            장르: <span className='text-white/80'>{plotData.genre}</span> | 분위기:{' '}
+            <span className='text-white/80'>{plotData.mood}</span>
+          </p>
         </div>
 
-        {/* 스토리보드 리스트 */}
-        <div className='space-y-4'>
-          {plotData.scenes.map((scene) => {
-            const isSelected = !!selectedScenes[scene.sceneNumber];
-            const isSelectPending =
-                selectPhotoMutation.isPending &&
-                selectPhotoMutation.variables?.selections[0].sceneNumber === scene.sceneNumber;
+        <div className='flex w-full gap-2 overflow-x-auto pb-1 md:w-auto md:justify-end'>
+          {STORY_TAGS.map((tag, idx) => (
+            <button
+              key={idx}
+              type='button'
+              className={
+                idx === 0
+                  ? 'whitespace-nowrap rounded-full border border-cyan-500/50 bg-cyan-500/10 px-3 py-1.5 text-[11px] text-cyan-300 shadow-[0_0_12px_rgba(34,211,238,0.1)] md:px-4 md:text-[12px]'
+                  : 'whitespace-nowrap rounded-full bg-white/5 px-3 py-1.5 text-[11px] text-white/70 md:px-4 md:text-[12px]'
+              }
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+      </div>
 
-            return (
-                <div key={scene.sceneNumber} className='flex gap-5'>
-                  {/* 왼쪽 인덱스 박스 (첨부하신 이미지의 에메랄드 그라데이션 및 감정 텍스트 반영) */}
-                  <div className='flex h-[110px] w-[140px] shrink-0 flex-col items-center justify-center rounded-[16px] bg-[linear-gradient(180deg,#60b5b1_0%,#439d98_100%)] shadow-md'>
-                    <span className='text-[30px] font-bold leading-none text-white'>{scene.sceneNumber}</span>
-                    <span className='mt-2 text-[13px] font-medium text-white/90'>{scene.emotion || '분위기'}</span>
-                  </div>
+      {/* 스토리보드 리스트 */}
+      <div className='space-y-4'>
+        {plotData.scenes.map((scene) => {
+          const isSelected = !!selectedScenes[scene.sceneNumber];
+          const isSelectPending =
+            selectPhotoMutation.isPending &&
+            selectPhotoMutation.variables?.selections[0].sceneNumber === scene.sceneNumber;
 
-                  {/* 정보 카드 (리스트 아이템 바디) */}
-                  <div className='flex flex-1 items-center justify-between rounded-[16px] bg-[#0c1216] px-8 py-5 border border-white/5 shadow-sm'>
-                    <div className='flex flex-1 items-center pr-8'>
-                      {/* 시각 요소 태그 */}
-                      <div className='flex w-[240px] shrink-0 gap-2'>
-                        {scene.visualElements.split(',').slice(0, 2).map((tag, i) => (
-                            <span
-                                key={i}
-                                className='rounded-full border border-white/5 bg-[#1c2429] px-3.5 py-1.5 text-[12px] text-white/70'
-                            >
-                        {tag.trim()}
-                      </span>
-                        ))}
-                      </div>
+          return (
+            <div key={scene.sceneNumber} className='flex flex-col gap-3 md:flex-row md:gap-5'>
+              {/* 왼쪽 인덱스 박스 */}
+              <div className='flex h-[96px] w-full shrink-0 flex-row items-center justify-center gap-3 rounded-[16px] bg-[linear-gradient(180deg,#60b5b1_0%,#439d98_100%)] px-4 shadow-md md:h-[110px] md:w-[140px] md:flex-col md:gap-0'>
+                <span className='text-[28px] font-bold leading-none text-white md:text-[30px]'>
+                  {scene.sceneNumber}
+                </span>
+                <span className='text-[13px] font-medium text-white/90 md:mt-2'>{scene.emotion || '분위기'}</span>
+              </div>
 
-                      {/* 수직 구분선 */}
-                      <div className='mx-6 h-8 w-px bg-white/10'></div>
-
-                      {/* 씬 설명 */}
-                      <p className='text-[15px] font-medium leading-relaxed text-white/90'>
-                        {scene.sceneDescription}
-                      </p>
-                    </div>
-
-                    {/* 조건부 버튼 로직 */}
-                    {isSelected ? (
-                        /* 1) 완료된 플롯: '완료' 표시 (체크 아이콘 포함) */
-                        <div className='flex h-[44px] w-[110px] items-center justify-center rounded-[12px] bg-[#22282c] text-[13px] font-medium text-white/80'>
-                          <svg
-                              className='mr-1.5 h-4 w-4 opacity-70'
-                              fill='none'
-                              stroke='currentColor'
-                              viewBox='0 0 24 24'
-                          >
-                            <path
-                                strokeLinecap='round'
-                                strokeLinejoin='round'
-                                strokeWidth='2.5'
-                                d='M5 13l4 4L19 7'
-                            ></path>
-                          </svg>
-                          <span className='text-[11px]'>완료</span>
-                        </div>
-                    ) : (
-                        /* 2) 미완료 플롯: '이미지 생성' 버튼 */
-                        <button
-                            onClick={() => handleSelectImage(scene.sceneNumber)}
-                            disabled={isSelectPending}
-                            className='flex h-[44px] w-[140px] cursor-pointer items-center justify-center rounded-[12px] bg-[#161e22] text-[12px] font-medium text-white/80 transition-all hover:bg-[#1f292e] disabled:cursor-not-allowed disabled:opacity-50'
+              {/* 정보 카드 */}
+              <div className='flex flex-1 flex-col gap-4 rounded-[16px] border border-white/5 bg-[#0c1216] px-4 py-4 shadow-sm md:flex-row md:items-center md:justify-between md:px-8 md:py-5'>
+                {/* 텍스트 영역 */}
+                <div className='flex flex-1 flex-col gap-4 md:flex-row md:items-center md:pr-8'>
+                  {/* 태그 */}
+                  <div className='flex w-full flex-wrap gap-2 md:w-[240px] md:shrink-0'>
+                    {scene.visualElements
+                      .split(',')
+                      .slice(0, 2)
+                      .map((tag, i) => (
+                        <span
+                          key={i}
+                          className='rounded-full border border-white/5 bg-[#1c2429] px-3 py-1.5 text-[11px] text-white/70 md:px-3.5 md:text-[12px]'
                         >
-                          <span className='text-[11px]'>{isSelectPending ? '처리 중...' : '이미지 생성'}</span>
-                          {!isSelectPending && (
-                              <div className='ml-2 flex items-center gap-1 rounded bg-white/10 px-1.5 py-0.5'>
-                                <img src='/token.png' alt='토큰' className='h-[11px] w-[11px] opacity-90' />
-                                <span className='text-[11px] font-semibold text-white'>3</span>
-                              </div>
-                          )}
-                        </button>
-                    )}
+                          {tag.trim()}
+                        </span>
+                      ))}
                   </div>
+
+                  {/* 구분선 */}
+                  <div className='hidden h-8 w-px bg-white/10 md:mx-6 md:block' />
+
+                  {/* 설명 */}
+                  <p className='text-[14px] font-medium leading-relaxed text-white/90 md:text-[15px]'>
+                    {scene.sceneDescription}
+                  </p>
                 </div>
-            );
-          })}
-        </div>
-      </section>
+
+                {/* 버튼 영역 */}
+                <div className='flex w-full md:w-auto md:justify-end'>
+                  {isSelected ? (
+                    <div className='flex h-[44px] w-full items-center justify-center rounded-[12px] bg-[#22282c] text-[13px] font-medium text-white/80 md:w-[110px]'>
+                      <svg className='mr-1.5 h-4 w-4 opacity-70' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2.5' d='M5 13l4 4L19 7' />
+                      </svg>
+                      <span className='text-[11px]'>완료</span>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handleSelectImage(scene.sceneNumber)}
+                      disabled={isSelectPending}
+                      className='flex h-[44px] w-full cursor-pointer items-center justify-center rounded-[12px] bg-[#161e22] text-[12px] font-medium text-white/80 transition-all hover:bg-[#1f292e] disabled:cursor-not-allowed disabled:opacity-50 md:w-[140px]'
+                    >
+                      <span className='text-[11px]'>{isSelectPending ? '처리 중...' : '이미지 생성'}</span>
+
+                      {!isSelectPending && (
+                        <div className='ml-2 flex items-center gap-1 rounded bg-white/10 px-1.5 py-0.5'>
+                          <img src='/token.png' alt='토큰' className='h-[11px] w-[11px] opacity-90' />
+                          <span className='text-[11px] font-semibold text-white'>3</span>
+                        </div>
+                      )}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
   );
 }
